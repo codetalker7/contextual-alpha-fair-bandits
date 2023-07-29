@@ -9,7 +9,8 @@ class Hedge(Policy):
         self.weights = np.ones((self.num_arms, ))
 
     def decision(self, context):
-        pass
+        # ignore context
+        return np.random.choice(self.num_arms, p=(self.weights / np.sum(self.weights))) + 1
 
     def feedback(self, rewards):
-        pass
+        self.weights = self.weights * np.exp(self.eta * rewards)
