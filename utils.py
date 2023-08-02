@@ -1,0 +1,2 @@
+def projectOnSimplex(vector):
+    pass
