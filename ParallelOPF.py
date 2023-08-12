@@ -4,6 +4,11 @@ import numpy as np
 import math
 
 class ParallelOPF(Policy):
+    """
+    :param num_contexts: Number of contexts.
+    :param num_arms: Number of arms.
+    :param alpha: Degree of fairness to be used in the concave fair function.
+    """
     def __init__(self, num_contexts, num_arms, alpha):
         super().__init__(num_contexts, num_arms)
         self.alpha = alpha
@@ -12,10 +17,13 @@ class ParallelOPF(Policy):
         self.last_decision = np.empty((self.num_arms, ))    # need to remember last decision to update cumulative rewards
         self.last_context = 0
 
+    """
+    :param int context: The current context. Should be in the range [0, num_contexts - 1].
+    """
     def decision(self, context):
         self.last_context = context
-        self.last_decision = self.parallel_policies[context].decision()
-        return self.last_decision
+        self.last_decision = self.parallel_policies[context].next_prediction
+        return np.random.choice(self.num_arms, p=self.last_decision) + 1
 
     def feedback(self, rewards):
         # update cumulative_rewards
