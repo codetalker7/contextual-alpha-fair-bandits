@@ -11,7 +11,7 @@ class OPF(Policy):
     """
     def __init__(self, num_contexts, num_arms, alpha):
         super().__init__(num_contexts, num_arms)
-        self.next_prediction = np.ones((self.num_arms, ))   # ignore contexts
+        self.next_prediction = np.ones((self.num_arms, )) / self.num_arms   # ignore contexts
         self.cumulative_gradient_norm = 0
         self.alpha = alpha
 
