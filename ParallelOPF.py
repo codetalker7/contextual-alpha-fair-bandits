@@ -1,7 +1,6 @@
 from Policy import Policy
 from OPF import OPF
 import numpy as np
-import math
 
 class ParallelOPF(Policy):
     """
