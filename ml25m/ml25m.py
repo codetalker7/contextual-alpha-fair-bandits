@@ -10,17 +10,17 @@ movies = movies.set_index("movieId")
 data = data[data["userId"].isin([1, 2])]
 
 # get filter movie categories, to be in Drama, action, comedy, adventure and crime
-movie_list = list(data["movieId"])
-def filter_function(ID):
-    genres = movies.loc[ID]["genres"].split("|")
-    genres_to_filter = ["Drama", "Action", "Comedy", "Adventure", "Crime"]
-
-    for genre in genres_to_filter:
-        if genre in genres:
-            return True
-
-    return False
-filtered_movie_list = list(filter(lambda ID : filter_function(ID), movie_list))
+# movie_list = list(data["movieId"])
+# def filter_function(ID):
+#     genres = movies.loc[ID]["genres"].split("|")
+#     genres_to_filter = ["Drama", "Action", "Comedy", "Adventure", "Crime"]
+#
+#     for genre in genres_to_filter:
+#         if genre in genres:
+#             return True
+#
+#     return False
+# filtered_movie_list = list(filter(lambda ID : filter_function(ID), movie_list))
 
 # get only those movies which belong to the filtered genres
 # data = data[data["movieId"].isin(filtered_movie_list)]
@@ -31,13 +31,15 @@ data = data.sample(frac=1).reset_index(drop=True)
 ########################
 
 ## running the policies
-from ..Hedge import Hedge
-from ..ParallelOPF import ParallelOPF
+import sys
+sys.path.append('/home/codetalker7/contextual-alpha-fair-bandits')
+from Hedge import Hedge
+from ParallelOPF import ParallelOPF
 
 ## 2 users, 5 genres
 NUM_CONTEXTS = 2
 NUM_ARMS = 5
-ALPHA = 0.6
+ALPHA = 0.9
 
 ## associate genres to indices
 genre_to_index = {
