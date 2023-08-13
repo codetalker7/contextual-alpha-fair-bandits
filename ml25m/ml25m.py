@@ -1,3 +1,4 @@
+### preparing data
 import numpy as np
 import pandas as pd
 import math
@@ -27,9 +28,11 @@ filtered_movie_list = list(filter(lambda ID : filter_function(ID), movie_list))
 # randomly shuffle the rows (to shuffle the contexts)
 data = data.sample(frac=1).reset_index(drop=True)
 
+########################
+
 ## running the policies
-from Hedge import Hedge
-from ParallelOPF import ParallelOPF
+from ..Hedge import Hedge
+from ..ParallelOPF import ParallelOPF
 
 ## 2 users, 5 genres
 NUM_CONTEXTS = 2
