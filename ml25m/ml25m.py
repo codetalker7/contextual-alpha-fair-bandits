@@ -74,11 +74,27 @@ def get_rewards(movieId):
 
     return rewards
 
+def jains_fairness_index(v):
+    n = v.shape[0]
+    return ((v.sum())**2) / (n * (v * v).sum())
+
 ## initialize policies
 hedge = Hedge(NUM_CONTEXTS, NUM_ARMS, len(data))     # 2 users, 5 genres
 parallelOPF = ParallelOPF(NUM_CONTEXTS, NUM_ARMS, ALPHA)
 
-for i in range(len(data)):
+## keeping track of cumulative rewards
+hedge_cum_rewards = [np.ones((NUM_ARMS, ))]
+popf_cum_rewards = [np.ones((NUM_ARMS, ))]
+
+## jain's fariness index
+hedge_fairness_index = []
+popf_fairness_index = []
+
+## sum of rewards
+hedge_sum_rewards = [0]
+popf_sum_rewards = [0]
+
+for t in range(len(data)):
     data_point = data.iloc[i]
     userId = int(data_point["userId"])
     movieId = int(data_point["userId"])
@@ -89,7 +105,22 @@ for i in range(len(data)):
     ## get rewards corresponding to the movie
     rewards = get_rewards(movieId)
 
+    ## update performance
+    hedge_sum_rewards.append(hedge_sum_rewards[-1] + rewards[hedge_recommended_genre - 1])
+    popf_sum_rewards.append(popf_sum_rewards[-1] + rewards[popf_recommended_genre - 1])
+
+    ## update cum rewards
+    hedge_last_cum_rewards = hedge_cum_rewards[-1]
+    popf_last_cum_rewards = popf_cum_rewards[-1]
+
+    hedge_cum_rewards.append(hedge_last_cum_rewards + rewards * (hedge.weights / np.sum(hedge.weights)))
+    popf_cum_rewards.append(popf_last_cum_rewards + rewards * parallelOPF.last_decision)
+
+    hedge_fairness_index.append(jains_fairness_index(hedge_cum_rewards[-1]))
+    popf_fairness_index.append(jains_fairness_index(popf_cum_rewards[-1]))
+
     ## feedback rewards to the policies
     hedge.feedback(rewards)
     parallelOPF.feedback(rewards)
 
+## plotting
