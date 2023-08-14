@@ -86,7 +86,7 @@ parallelOPF = ParallelOPF(NUM_CONTEXTS, NUM_ARMS, ALPHA)
 hedge_cum_rewards = [np.ones((NUM_ARMS, ))]
 popf_cum_rewards = [np.ones((NUM_ARMS, ))]
 
-## jain's fariness index
+## jain's fairness index
 hedge_fairness_index = []
 popf_fairness_index = []
 
@@ -95,9 +95,9 @@ hedge_sum_rewards = [0]
 popf_sum_rewards = [0]
 
 for t in range(len(data)):
-    data_point = data.iloc[i]
+    data_point = data.iloc[t]
     userId = int(data_point["userId"])
-    movieId = int(data_point["userId"])
+    movieId = int(data_point["movieId"])
 
     hedge_recommended_genre = hedge.decision(userId - 1)    # context labels start from 0
     popf_recommended_genre = parallelOPF.decision(userId - 1)
@@ -124,3 +124,22 @@ for t in range(len(data)):
     parallelOPF.feedback(rewards)
 
 ## plotting
+%matplotlib inline
+import matplotlib.pyplot as plt
+
+time = np.arange(1, len(data) + 1)
+
+## plotting performance
+hedge_performance = np.array(hedge_sum_rewards)[1:] * (1 / time)
+popf_performance = np.array(popf_sum_rewards)[1:] * (1 / time)
+
+plt.plot(time, hedge_performance, label="hedge")
+plt.plot(time, popf_performance, label="parallel OPF")
+plt.legend()
+plt.show()
+
+## plotting fairness
+plt.plot(time, hedge_fairness_index, label="hedge")
+plt.plot(time, popf_fairness_index, label="parallel OPF")
+plt.legend()
+plt.show()
