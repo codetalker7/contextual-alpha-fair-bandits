@@ -16,3 +16,23 @@ def projectOnSimplex(v):
     # compute the projection by thresholding v using theta
     w = (v - theta).clip(min=0)
     return w
+
+def log_opt(v):
+    """
+    Solves the maximization problem sum_i log(x_i) + sum_i x_i * z_i
+    subject to the constraint that x lies on the standard simplex
+    """
+
+    est = -v.max() - 1
+    f_val = 1
+
+    while(abs(f_val) >= 1e-9 or max(v + est) > 0):
+        f_val = (1 / (v + est)).sum() + 1
+        f_dash = -(((1 / (v + est))**2).sum())
+        est = est - f_val / f_dash
+
+    opt_point = -(1 / (v + est))
+    opt_val = np.log(opt_point).sum() + np.inner(opt_point, v)
+    return (opt_point, opt_val)
+
+
