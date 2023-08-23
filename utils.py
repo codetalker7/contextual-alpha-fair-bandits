@@ -32,6 +32,7 @@ def log_opt(v):
         est = est - f_val / f_dash
 
     opt_point = -(1 / (v + est))
+    opt_point = projectOnSimplex(opt_point)     # for safety, project onto simplex
     opt_val = np.log(opt_point).sum() + np.inner(opt_point, v)
     return (opt_point, opt_val)
 
