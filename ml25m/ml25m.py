@@ -1,9 +1,13 @@
 import numpy as np
 import pandas as pd
-import math
 import pickle
+import argparse
 import sys
 sys.path.append('/home/codetalker7/contextual-alpha-fair-bandits')
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--ALPHA', dest='ALPHA', default=0.5, help='Fairness level')
+args = parser.parse_args()
 
 with open("data.pickle", 'rb') as f:
     data = pickle.load(f)
@@ -21,7 +25,9 @@ from utils import jains_fairness_index
 
 NUM_CONTEXTS = len(data["userId"].unique())
 NUM_ARMS = len(categories)
-ALPHA = 0.9
+ALPHA = float(args.ALPHA)
+
+print("ALPHA: ", ALPHA)
 
 def get_rewards(movieId):
     genres = movies.loc[movieId]["genres"].split("|")
