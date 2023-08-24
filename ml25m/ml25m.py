@@ -143,3 +143,45 @@ plt.plot(time, hedge_fairness_index, label="hedge")
 plt.plot(time, popf_fairness_index, label="parallel OPF")
 plt.legend()
 plt.show()
+
+###################
+### Bandit Feedback setting
+from ScaleFreeMAB import ScaleFreeMAB
+
+scaleFreePolicy = ScaleFreeMAB(NUM_CONTEXTS, NUM_ARMS)
+
+## keeping track of cumulative rewards
+scaleFree_cum_rewards = [np.ones((NUM_ARMS, ))]
+
+## jain's fairness index
+scaleFree_fairness_index = []
+
+## sum of rewards
+scaleFree_sum_rewards = [0]
+
+for t in range(len(data)):
+    data_point = data.iloc[t]
+    userId = int(data_point["userId"])
+    movieId = int(data_point["movieId"])
+
+    scaleFree_recommended_genre = scaleFreePolicy.decision(userId - 1)      # context labels start from 0
+
+    ## characteristic vector for chosen arm
+    scaleFree_char_vector = np.zeros((NUM_ARMS, ))
+    scaleFree_char_vector[scaleFree_recommended_genre - 1] = 1
+
+    ## get rewards corresponding to the movie
+    rewards = get_rewards(movieId)
+
+    ## update performance, only bandit feedback
+    scaleFree_sum_rewards.append(scaleFree_sum_rewards[-1] + rewards[scaleFree_recommended_genre - 1])
+
+    ## update cum rewards
+    scaleFree_last_cum_rewards = scaleFree_cum_rewards[-1]
+
+    scaleFree_cum_rewards.append(scaleFree_last_cum_rewards + rewards * scaleFree_char_vector)
+
+    scaleFree_fairness_index.append(jains_fairness_index(scaleFree_cum_rewards[-1]))
+
+    ## feedback rewards to the policies
+    scaleFreePolicy.feedback(rewards[scaleFree_recommended_genre - 1])

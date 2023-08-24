@@ -20,6 +20,7 @@ class ScaleFreeMAB(BanditPolicy):
         self.cum_estimation_schemes = np.zeros((num_arms, ))    # cumulative sum of estimation schemes
 
     def decision(self, context):
+        # ignore context
         self.sampling_scheme = (1 - self.last_gamma) * self.p + self.last_gamma / self.num_arms
         self.last_chosen_arm = np.random.choice(self.num_arms, p=self.sampling_scheme) + 1
         return self.last_chosen_arm
