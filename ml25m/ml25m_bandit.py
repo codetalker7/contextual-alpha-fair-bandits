@@ -86,8 +86,11 @@ for t in range(len(data)):
     parallelScaleFreePolicy.feedback(rewards[parallelScaleFree_recommended_genre - 1])
 
 ## plotting
-%matplotlib inline
+# %matplotlib inline
 import matplotlib.pyplot as plt
+
+PERFORMANCE_PLOT_PATH = "performance_bandit_information.png"
+JAINS_FAIRNESS_PLOT_PATH = "jains_index_bandit_information.png"
 
 time = np.arange(1, len(data) + 1)
 
@@ -95,13 +98,15 @@ time = np.arange(1, len(data) + 1)
 scaleFree_performance = np.array(scaleFree_sum_rewards)[1:] * (1 / time)
 parallelScaleFree_performance = np.array(parallelScaleFree_sum_rewards)[1:] * (1 / time)
 
+plt.figure(0)
 plt.plot(time, scaleFree_performance, label="scaleFree")
 plt.plot(time, parallelScaleFree_performance, label="parallelScaleFree")
 plt.legend()
-plt.show()
+plt.savefig(PERFORMANCE_PLOT_PATH)
 
 ## plotting fairness
+plt.figure(1)
 plt.plot(time, scaleFree_fairness_index, label="scaleFree")
 plt.plot(time, parallelScaleFree_fairness_index, label="parallelScaleFree")
 plt.legend()
-plt.show()
+plt.savefig(JAINS_FAIRNESS_PLOT_PATH)

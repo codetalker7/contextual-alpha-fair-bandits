@@ -81,8 +81,11 @@ for t in range(len(data)):
     parallelOPF.feedback(rewards)
 
 ## plotting
-%matplotlib inline
+# %matplotlib inline
 import matplotlib.pyplot as plt
+
+PERFORMANCE_PLOT_PATH = "performance_full_information.png"
+JAINS_FAIRNESS_PLOT_PATH = "jains_index_full_information.png"
 
 time = np.arange(1, len(data) + 1)
 
@@ -90,13 +93,15 @@ time = np.arange(1, len(data) + 1)
 hedge_performance = np.array(hedge_sum_rewards)[1:] * (1 / time)
 popf_performance = np.array(popf_sum_rewards)[1:] * (1 / time)
 
+plt.figure(0)
 plt.plot(time, hedge_performance, label="hedge")
 plt.plot(time, popf_performance, label="parallel OPF")
 plt.legend()
-plt.show()
+plt.savefig(PERFORMANCE_PLOT_PATH)
 
 ## plotting fairness
+plt.figure(1)
 plt.plot(time, hedge_fairness_index, label="hedge")
 plt.plot(time, popf_fairness_index, label="parallel OPF")
 plt.legend()
-plt.show()
+plt.savefig(JAINS_FAIRNESS_PLOT_PATH)
