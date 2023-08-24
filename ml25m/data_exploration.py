@@ -5,7 +5,7 @@ data = pd.read_csv("data/ml-25m/ratings.csv")
 movies = pd.read_csv("data/ml-25m/movies.csv")
 movies = movies.set_index("movieId")
 
-ROWS = 10000
+ROWS = 50000
 ## work with the first ROWS rows
 data = data.iloc[:ROWS]
 data["movieId"].unique()
