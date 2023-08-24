@@ -20,6 +20,9 @@ def filter_movies(movieId):
 
 data = data[data.apply(lambda row: filter_movies(row["movieId"]), axis=1)]
 
+# randomly shuffle the rows (to shuffle the contexts)
+data = data.sample(frac=1).reset_index(drop=True)
+
 categories = set()
 
 for i in range(len(data)):
