@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 import math
 import pickle
+import sys
+sys.path.append('/home/codetalker7/contextual-alpha-fair-bandits')
 
 with open("data.pickle", 'rb') as f:
     data = pickle.load(f)
@@ -13,18 +15,13 @@ movies = pd.read_csv("data/ml-25m/movies.csv")
 movies = movies.set_index("movieId")
 
 ## running the policies
-import sys
-sys.path.append('/home/codetalker7/contextual-alpha-fair-bandits')
 from Hedge import Hedge
 from ParallelOPF import ParallelOPF
+from utils import jains_fairness_index
 
 NUM_CONTEXTS = len(data["userId"].unique())
 NUM_ARMS = len(categories)
 ALPHA = 0.9
-
-## alpha-fair utility function
-def utility(x):
-    return math.pow(x, 1 - ALPHA) / (1 - ALPHA)
 
 def get_rewards(movieId):
     genres = movies.loc[movieId]["genres"].split("|")
@@ -38,12 +35,8 @@ def get_rewards(movieId):
 
     return rewards
 
-def jains_fairness_index(v):
-    n = v.shape[0]
-    return ((v.sum())**2) / (n * (v * v).sum())
-
 ## initialize policies
-hedge = Hedge(NUM_CONTEXTS, NUM_ARMS, len(data))     # 2 users, 5 genres
+hedge = Hedge(NUM_CONTEXTS, NUM_ARMS, len(data))
 parallelOPF = ParallelOPF(NUM_CONTEXTS, NUM_ARMS, ALPHA)
 
 ## keeping track of cumulative rewards

@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 import math
 import pickle
+import sys
+sys.path.append('/home/codetalker7/contextual-alpha-fair-bandits')
 
 with open("data.pickle", 'rb') as f:
     data = pickle.load(f)
@@ -12,22 +14,13 @@ with open("categories.pickle", 'rb') as f:
 movies = pd.read_csv("data/ml-25m/movies.csv")
 movies = movies.set_index("movieId")
 
-# randomly shuffle the rows (to shuffle the contexts)
-# data = data.sample(frac=1).reset_index(drop=True)
-
-import sys
-sys.path.append('/home/codetalker7/contextual-alpha-fair-bandits')
 from ScaleFreeMAB import ScaleFreeMAB
 from ParallelScaleFreeMAB import ParallelScaleFreeMAB
+from utils import jains_fairness_index
 
-## 2 users, 5 genres
 NUM_CONTEXTS = len(data["userId"].unique())
 NUM_ARMS = len(categories)
 ALPHA = 0.9
-
-## alpha-fair utility function
-def utility(x):
-    return math.pow(x, 1 - ALPHA) / (1 - ALPHA)
 
 def get_rewards(movieId):
     genres = movies.loc[movieId]["genres"].split("|")
@@ -40,10 +33,6 @@ def get_rewards(movieId):
             rewards[index] = 0
 
     return rewards
-
-def jains_fairness_index(v):
-    n = v.shape[0]
-    return ((v.sum())**2) / (n * (v * v).sum())
 
 scaleFreePolicy = ScaleFreeMAB(NUM_CONTEXTS, NUM_ARMS)
 parallelScaleFreePolicy = ParallelScaleFreeMAB(NUM_CONTEXTS, NUM_ARMS, ALPHA)
