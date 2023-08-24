@@ -5,8 +5,11 @@ from ScaleFreeMAB import ScaleFreeMAB
 
 class ParallelScaleFreeMAB(BanditPolicy):
     """
+    Chaudhary et. al. 2023's fair contextual bandit policy for the bandit setting.
+
     :param int num_contexts: Number of contexts.
     :param int num_arms: Number of arms.
+    :param float alpha: Degree of fairness to be used in the concave fair function.
     """
     def __init__(self, num_contexts, num_arms, alpha):
         super().__init__(num_contexts, num_arms)

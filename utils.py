@@ -1,6 +1,14 @@
 import numpy as np
 
 def projectOnSimplex(v):
+    """
+    A fast and efficient projection algorithm to project onto the
+    standard probability simplex.
+
+    :param numpy.ndarray v: Vector to project onto the simplex.
+    :returns: Projection of the input onto the standard probability simplex.
+    :rtype numpy.ndarray
+    """
     n, = v.shape
     # check if we are already on the simplex
     if v.sum() == 1 and np.alltrue(v >= 0):
@@ -19,8 +27,12 @@ def projectOnSimplex(v):
 
 def log_opt(v):
     """
-    Solves the maximization problem sum_i log(x_i) + sum_i x_i * z_i
+    Solves the maximization problem sum_i log(x_i) + sum_i x_i * v_i
     subject to the constraint that x lies on the standard simplex
+
+    :param numpy.ndarray v: Input vector to the above optimization problem.
+    :returns: A tuple containing point on the simplex attaining the optimum and the optimal value.
+    :rtype tuple
     """
 
     est = -v.max() - 1

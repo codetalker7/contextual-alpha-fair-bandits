@@ -5,6 +5,10 @@ from BanditPolicy import BanditPolicy
 
 class ScaleFreeMAB(BanditPolicy):
     """
+    Putta and Aggarwal 2022's scale-free multi armed bandit policy, used as a subroutine
+    in the ``ParallelScaleFreeMAB`` policy. This policy is context-independent, and will
+    ignore any contexts given to it.
+
     :param int num_contexts: Number of contexts.
     :param int num_arms: Number of arms.
     """
