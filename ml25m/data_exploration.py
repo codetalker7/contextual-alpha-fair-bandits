@@ -35,10 +35,10 @@ import pickle
 DATAPATH = "data.pickle"
 CATEGORIES_PATH = "categories.pickle"
 
-with open(DATAPATH, 'rb') as f:
+with open(DATAPATH, 'wb') as f:
     pickle.dump(data, f)
 
-with open(CATEGORIES_PATH, 'rb') as f:
-    pickle.dump(categories, f)
+with open(CATEGORIES_PATH, 'wb') as f:
+    pickle.dump(list(categories), f)
 
 
