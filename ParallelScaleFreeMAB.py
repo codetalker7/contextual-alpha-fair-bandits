@@ -1,5 +1,4 @@
 import numpy as np
-import utils
 
 from BanditPolicy import BanditPolicy
 from ScaleFreeMAB import ScaleFreeMAB
