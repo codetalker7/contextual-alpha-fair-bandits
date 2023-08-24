@@ -48,4 +48,13 @@ def log_opt(v):
     opt_val = np.log(opt_point).sum() + np.inner(opt_point, v)
     return (opt_point, opt_val)
 
+def jains_fairness_index(v):
+    """
+    Return Jain's Fairness Index, computed on the coordinates of the vector ``v``.
 
+    :param numpy.ndarray v: Vector to compute the index on.
+    :returns: Jain's fairness index.
+    :rtype: float
+    """
+    n = v.shape[0]
+    return ((v.sum())**2) / (n * (v * v).sum())
