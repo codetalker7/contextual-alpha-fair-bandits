@@ -1,4 +1,5 @@
 import numpy as np
+import math
 
 def projectOnSimplex(v):
     """
@@ -58,3 +59,42 @@ def jains_fairness_index(v):
     """
     n = v.shape[0]
     return ((v.sum())**2) / (n * (v * v).sum())
+
+def ftrlOptimize(v, eta):
+    """
+    Performs the optimization step for the Follow the Regularized Leader
+    (FTRL) framework with entropic regularizer over the standard probability simplex. Returns
+    a point ``p`` which maximizes ``p * v - p * log(p)`` along with the optimal value. See Algorithm 6
+    of the paper "k-experts - Online Policies and Fundamental Limits" for the algorithm.
+
+    :param cumulativeGradient: Total gradient seen until the previous iteration.
+    :param float eta: Learning rate.
+    :returns: Tuple containing point ``p`` in the standard simplex attaining the optimum and the optimal value.
+    :rtype: tuple
+
+    """
+    N = v.shape[0]
+
+    # sort cumulativeGradient in non-increasing order
+    orderedVector = -np.sort(-v)
+
+    # finding i_star
+    i_star = N
+    tail_sum = 0
+    while i_star >= 1:
+        if (1 - i_star)*math.exp(eta*orderedVector[i_star - 1]) >= tail_sum:
+            break
+        else:
+            tail_sum = tail_sum + math.exp(eta*orderedVector[i_star - 1])
+            i_star = i_star - 1
+
+    # computing K
+    if i_star == N:     # we will have k = N in this case
+        return np.ones(shape=N)
+
+    # assuming that i_star < N
+    K = (1 - i_star)/tail_sum
+    p = np.zeros(shape=N)
+    for i in range(1, N + 1):
+        p[i - 1] = min(1, K*math.exp(eta*orderedVector[i - 1]))
+    return p
