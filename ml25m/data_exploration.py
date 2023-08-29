@@ -1,11 +1,24 @@
 import numpy as np
+from numpy.random import random
 import pandas as pd
-import math
+import argparse
+
+from pandas.core.common import random_state
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--ROWS', dest='ROWS', default=50000, help='Number of rows of the dataset to use.')
+parser.add_argument('--SEED', dest='SEED', default=42, help='Random seed to shuffle the dataset.')
+args = parser.parse_args()
+
 data = pd.read_csv("data/ml-25m/ratings.csv")
 movies = pd.read_csv("data/ml-25m/movies.csv")
 movies = movies.set_index("movieId")
 
-ROWS = 50000
+ROWS = int(args.ROWS)
+SEED = int(args.SEED)
+print("Number of rows to use: ", ROWS)
+print("Random seed to shuffle dataset: ", SEED)
+
 ## work with the first ROWS rows
 data = data.iloc[:ROWS]
 data["movieId"].unique()
@@ -21,7 +34,7 @@ def filter_movies(movieId):
 data = data[data.apply(lambda row: filter_movies(row["movieId"]), axis=1)]
 
 # randomly shuffle the rows (to shuffle the contexts)
-data = data.sample(frac=1).reset_index(drop=True)
+data = data.sample(frac=1, random_state=SEED).reset_index(drop=True)
 
 categories = set()
 
