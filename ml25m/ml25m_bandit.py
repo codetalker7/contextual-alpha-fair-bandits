@@ -8,6 +8,7 @@ sys.path.append('/home/codetalker7/contextual-alpha-fair-bandits')
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--ALPHA', dest='ALPHA', default=0.5, help='Fairness level')
+parser.add_argument('--SMALLREWARD', dest='SMALL_REWARD', default=0.001, help='Very small reward for the bad arm.')
 args = parser.parse_args()
 
 with open("data.pickle", 'rb') as f:
@@ -26,8 +27,10 @@ from utils import jains_fairness_index
 NUM_CONTEXTS = len(data["userId"].unique())
 NUM_ARMS = len(categories)
 ALPHA = float(args.ALPHA)
+SMALL_REWARD = float(args.SMALL_REWARD)
 
 print("ALPHA: ", ALPHA)
+print("SMALL_REWARD: ", SMALL_REWARD)
 
 def get_rewards(movieId):
     genres = movies.loc[movieId]["genres"].split("|")
@@ -37,7 +40,7 @@ def get_rewards(movieId):
         if categories[index] in genres:
             rewards[index] = 1
         else:
-            rewards[index] = 0
+            rewards[index] = SMALL_REWARD
 
     return rewards
 
