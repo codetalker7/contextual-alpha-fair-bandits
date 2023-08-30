@@ -58,18 +58,19 @@ for i in range(NUM_CONTEXTS):
     constraints += [0 <= variables[i], variables[i] <= 1]
     constraints += [cp.sum(variables[i]) == 1]
 
-objective_function = cp.expressions.constants.Constant(0)
+cumulative_rewards = [cp.expressions.constants.Constant(1) for i in range(NUM_ARMS)]
+offline_optimal_values = []
 
-for i in range(NUM_ARMS):
-    cumulative_reward_arm = cp.expressions.constants.Constant(1)
-    for t in range(len(data)):
-        context_t = context_sequence[t]
-        cumulative_reward_arm +=  reward_sequence[t][i] * variables[context_t - 1][i]
-    cumulative_reward_arm = (cumulative_reward_arm ** ALPHA) / (1 - ALPHA)
-    objective_function += cumulative_reward_arm
+for t in range(len(data)):
+    objective_function = cp.expressions.constants.Constant(0)
 
-objective_function = -objective_function
-obj = cp.Minimize(objective_function)
+    context_t = context_sequence[t]
+    for i in range(NUM_ARMS):
+        cumulative_rewards[i] += reward_sequence[t][i] * variables[context_t - 1][i]
+        objective_function += (cumulative_rewards[i] ** ALPHA) / (1 - ALPHA)
 
-problem = cp.Problem(obj, constraints)
-problem.solve()
+    obj = cp.Minimize(-objective_function)
+    problem = cp.Problem(obj, constraints)
+    problem.solve()
+
+    offline_optimal_values.append(-problem.value)
