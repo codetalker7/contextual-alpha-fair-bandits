@@ -68,7 +68,7 @@ for t in tqdm(range(len(data))):
     context_t = context_sequence[t]
     for i in range(NUM_ARMS):
         cumulative_rewards[i] += reward_sequence[t][i] * variables[context_t - 1][i]
-        objective_function += (cumulative_rewards[i] ** ALPHA) / (1 - ALPHA)
+        objective_function += (cumulative_rewards[i] ** (1 - ALPHA)) / (1 - ALPHA)
 
     obj = cp.Minimize(-objective_function)
     problem = cp.Problem(obj, constraints)
@@ -77,5 +77,5 @@ for t in tqdm(range(len(data))):
     offline_optimal_values.append(-problem.value)
 
 # saving the offline optimal values
-with open("offline_optimal.pickle", "rb") as f:
+with open("offline_optimal.pickle", "wb") as f:
     pickle.dump(offline_optimal_values, f)
