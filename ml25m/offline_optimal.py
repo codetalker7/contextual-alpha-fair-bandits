@@ -4,6 +4,7 @@ import pandas as pd
 import pickle
 import argparse
 import random
+from tqdm import tqdm
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--ALPHA', dest='ALPHA', default=0.5, help='Fairness level')
@@ -61,7 +62,7 @@ for i in range(NUM_CONTEXTS):
 cumulative_rewards = [cp.expressions.constants.Constant(1) for i in range(NUM_ARMS)]
 offline_optimal_values = []
 
-for t in range(len(data)):
+for t in tqdm(range(len(data))):
     objective_function = cp.expressions.constants.Constant(0)
 
     context_t = context_sequence[t]
