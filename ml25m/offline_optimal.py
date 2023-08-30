@@ -75,3 +75,7 @@ for t in tqdm(range(len(data))):
     problem.solve()
 
     offline_optimal_values.append(-problem.value)
+
+# saving the offline optimal values
+with open("offline_optimal.pickle", "rb") as f:
+    pickle.dump(offline_optimal_values, f)
