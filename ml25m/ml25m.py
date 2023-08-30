@@ -28,9 +28,15 @@ NUM_CONTEXTS = len(data["userId"].unique())
 NUM_ARMS = len(categories)
 ALPHA = float(args.ALPHA)
 SMALL_REWARD = float(args.SMALL_REWARD)
+APPROX_FACTOR = (1 - ALPHA) ** (-(1 - ALPHA)) 
 
 print("ALPHA: ", ALPHA)
+print("APPROXIMATION FACTOR: ", APPROX_FACTOR)
 print("SMALL_REWARD: ", SMALL_REWARD)
+
+# getting the offline optimal objectives
+with open("offline_optimal.pickle", "rb") as f:
+    offline_optimal_values = pickle.load(f)
 
 def get_rewards(movieId):
     genres = movies.loc[movieId]["genres"].split("|")
@@ -60,6 +66,10 @@ popf_fairness_index = []
 hedge_sum_rewards = [0]
 popf_sum_rewards = [0]
 
+## approximate regrets
+hedge_approximate_regret = []
+popf_approximate_regret = []
+
 for t in range(len(data)):
     data_point = data.iloc[t]
     userId = int(data_point["userId"])
@@ -82,8 +92,13 @@ for t in range(len(data)):
     hedge_cum_rewards.append(hedge_last_cum_rewards + rewards * (hedge.weights / np.sum(hedge.weights)))
     popf_cum_rewards.append(popf_last_cum_rewards + rewards * parallelOPF.last_decision)
 
+    ## update the fairness index
     hedge_fairness_index.append(jains_fairness_index(hedge_cum_rewards[-1]))
     popf_fairness_index.append(jains_fairness_index(popf_cum_rewards[-1]))
+
+    ## update the approximate regret
+    hedge_approximate_regret.append(offline_optimal_values[t] - APPROX_FACTOR * ((hedge_cum_rewards[-1] ** (1 - ALPHA)) / (1 - ALPHA)).sum())
+    popf_approximate_regret.append(offline_optimal_values[t] - APPROX_FACTOR * ((popf_cum_rewards[-1] ** (1 - ALPHA)) / (1 - ALPHA)).sum())
 
     ## feedback rewards to the policies
     hedge.feedback(rewards)
@@ -95,6 +110,7 @@ import matplotlib.pyplot as plt
 
 PERFORMANCE_PLOT_PATH = "performance_full_information.png"
 JAINS_FAIRNESS_PLOT_PATH = "jains_index_full_information.png"
+APPROXIMATE_REGRET_PLOT_PATH = "approximate_regret_full_information.png"
 
 time = np.arange(1, len(data) + 1)
 
@@ -114,3 +130,12 @@ plt.plot(time, hedge_fairness_index, label="hedge")
 plt.plot(time, popf_fairness_index, label="parallel OPF")
 plt.legend()
 plt.savefig(JAINS_FAIRNESS_PLOT_PATH)
+
+
+## plotting regrets
+plt.figure(2)
+plt.plot(time, hedge_approximate_regret, label="hedge")
+plt.plot(time, popf_approximate_regret, label="parallel OPF")
+plt.legend()
+plt.savefig(APPROXIMATE_REGRET_PLOT_PATH)
+
