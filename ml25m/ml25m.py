@@ -131,7 +131,6 @@ plt.plot(time, popf_fairness_index, label="parallel OPF")
 plt.legend()
 plt.savefig(JAINS_FAIRNESS_PLOT_PATH)
 
-
 ## plotting regrets
 plt.figure(2)
 plt.plot(time, hedge_approximate_regret, label="hedge")

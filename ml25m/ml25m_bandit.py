@@ -28,9 +28,14 @@ NUM_CONTEXTS = len(data["userId"].unique())
 NUM_ARMS = len(categories)
 ALPHA = float(args.ALPHA)
 SMALL_REWARD = float(args.SMALL_REWARD)
+APPROX_FACTOR = (1 - ALPHA) ** (-(1 - ALPHA)) 
 
 print("ALPHA: ", ALPHA)
 print("SMALL_REWARD: ", SMALL_REWARD)
+
+# getting the offline optimal objectives
+with open("offline_optimal.pickle", "rb") as f:
+    offline_optimal_values = pickle.load(f)
 
 def get_rewards(movieId):
     genres = movies.loc[movieId]["genres"].split("|")
@@ -58,6 +63,10 @@ parallelScaleFree_fairness_index = []
 ## sum of rewards
 scaleFree_sum_rewards = [0]
 parallelScaleFree_sum_rewards = [0]
+
+## approximate regrets
+scaleFree_approximate_regret = []
+parallelScaleFree_approximate_regret = []
 
 for t in range(len(data)):
     data_point = data.iloc[t]
@@ -88,8 +97,13 @@ for t in range(len(data)):
     scaleFree_cum_rewards.append(scaleFree_last_cum_rewards + rewards * scaleFree_char_vector)
     parallelScaleFree_cum_rewards.append(parallelScaleFree_last_cum_rewards + rewards * parallelScaleFree_char_vector)
 
+    ## update the fairness index
     scaleFree_fairness_index.append(jains_fairness_index(scaleFree_cum_rewards[-1]))
     parallelScaleFree_fairness_index.append(jains_fairness_index(parallelScaleFree_cum_rewards[-1]))
+
+    ## update the approximate regrets
+    scaleFree_approximate_regret.append(offline_optimal_values[t] - APPROX_FACTOR * ((scaleFree_cum_rewards[-1] ** (1 - ALPHA)) / (1 - ALPHA)).sum())
+    parallelScaleFree_approximate_regret.append(offline_optimal_values[t] - APPROX_FACTOR * ((parallelScaleFree_cum_rewards[-1] ** (1 - ALPHA)) / (1 - ALPHA)).sum())
 
     ## feedback rewards to the policies
     scaleFreePolicy.feedback(rewards[scaleFree_recommended_genre - 1])
@@ -101,6 +115,7 @@ import matplotlib.pyplot as plt
 
 PERFORMANCE_PLOT_PATH = "performance_bandit_information.png"
 JAINS_FAIRNESS_PLOT_PATH = "jains_index_bandit_information.png"
+APPROXIMATE_REGRET_PLOT_PATH = "approximate_regret_bandit_information.png"
 
 time = np.arange(1, len(data) + 1)
 
@@ -120,3 +135,10 @@ plt.plot(time, scaleFree_fairness_index, label="scaleFree")
 plt.plot(time, parallelScaleFree_fairness_index, label="parallelScaleFree")
 plt.legend()
 plt.savefig(JAINS_FAIRNESS_PLOT_PATH)
+
+## plotting regrets
+plt.figure(2)
+plt.plot(time, scaleFree_approximate_regret, label="scaleFree")
+plt.plot(time, parallelScaleFree_approximate_regret, label="parallelScaleFree")
+plt.legend()
+plt.savefig(APPROXIMATE_REGRET_PLOT_PATH)
