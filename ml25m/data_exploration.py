@@ -45,6 +45,10 @@ for i in range(len(data)):
     for category in movie_categories:
         categories.add(category)
 
+# printing the stats
+print("Number of contexts: ", len(data["userId"].unique()))
+print("Number of arms:", len(list(categories)))
+
 # saving the data to work with it later
 import pickle
 
