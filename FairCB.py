@@ -24,9 +24,10 @@ class FairCB(Policy):
         self.context_distribution = context_distribution
         self.eta = math.sqrt((num_contexts * math.log(num_arms)) / (T * num_arms))
         self.ps = [np.ones((num_arms, )) for i in range(num_contexts)]
-        self.cumulative_loss_estimators = [np.zeros((num_arms, 0)) for i in range(num_contexts)]
+        self.cumulative_loss_estimators = [np.zeros((num_arms, )) for i in range(num_contexts)]
         self.last_context = 0
         self.last_chosen_arm = 1
+        self.last_decision = np.empty((self.num_arms, ))    # need to remember last decision to update cumulative rewards
 
     def decision(self, context):
         # save the context
@@ -46,7 +47,7 @@ class FairCB(Policy):
             objective_function += variable[context_id, :] @ self.cumulative_loss_estimators[context_id]
 
         # solve the problem
-        obj = cp.minimize(objective_function)
+        obj = cp.Minimize(objective_function)
         problem = cp.Problem(obj, constraints)
         problem.solve()
 
@@ -55,6 +56,7 @@ class FairCB(Policy):
             self.ps[context_id] = utils.projectOnSimplex(variable.value[context_id, :])
 
         # return decision for this context
+        self.last_decision = self.ps[context]
         self.last_chosen_arm = np.random.choice(self.num_arms, p=self.ps[context]) + 1
         return self.last_chosen_arm
 
