@@ -26,6 +26,10 @@ NUM_ARMS = len(categories)
 ALPHA = float(args.ALPHA)
 SMALL_REWARD = float(args.SMALL_REWARD)
 
+# printing args
+print("ALPHA: ", ALPHA)
+print("SMALL_REWARD: ", SMALL_REWARD)
+
 def get_rewards(movieId):
     genres = movies.loc[movieId]["genres"].split("|")
     rewards = np.zeros((NUM_ARMS, ))
