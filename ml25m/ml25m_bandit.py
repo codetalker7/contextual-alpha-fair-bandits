@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-import math
 import pickle
 import argparse
 import sys
@@ -9,6 +8,7 @@ sys.path.append('/home/codetalker7/contextual-alpha-fair-bandits')
 parser = argparse.ArgumentParser()
 parser.add_argument('--ALPHA', dest='ALPHA', default=0.5, help='Fairness level')
 parser.add_argument('--SMALLREWARD', dest='SMALL_REWARD', default=0.001, help='Very small reward for the bad arm.')
+parser.add_argument('--SEED', dest='SEED', default=42, help='Random seed to have reproducible results.')
 args = parser.parse_args()
 
 with open("data.pickle", 'rb') as f:
@@ -30,8 +30,15 @@ ALPHA = float(args.ALPHA)
 SMALL_REWARD = float(args.SMALL_REWARD)
 APPROX_FACTOR = (1 - ALPHA) ** (-(1 - ALPHA)) 
 
+## random seed for numpy
+np.random.seed(int(args.SEED))
+
+print("ARMS: ", NUM_ARMS)
+print("CONTEXTS: ", NUM_CONTEXTS)
 print("ALPHA: ", ALPHA)
+print("APPROXIMATION FACTOR: ", APPROX_FACTOR)
 print("SMALL_REWARD: ", SMALL_REWARD)
+print("SEED: ", int(args.SEED))
 
 # getting the offline optimal objectives
 with open("offline_optimal.pickle", "rb") as f:
