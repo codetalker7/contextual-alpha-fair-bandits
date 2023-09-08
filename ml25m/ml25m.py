@@ -75,6 +75,11 @@ hedge_cum_rewards = [np.ones((NUM_ARMS, ))]
 popf_cum_rewards = [np.ones((NUM_ARMS, ))]
 fairCB_cum_rewards = [np.ones((NUM_ARMS, ))]
 
+## alpha-performance
+hedge_alpha_performance = []
+popf_alpha_performance = []
+fairCB_alpha_performance = []
+
 ## jain's fairness index
 hedge_fairness_index = []
 popf_fairness_index = []
@@ -121,6 +126,11 @@ for t in tqdm(range(len(data))):
     popf_cum_rewards.append(popf_last_cum_rewards + rewards * parallelOPF.last_decision)
     fairCB_cum_rewards.append(fairCB_last_cum_rewards + rewards * fairCB.last_decision)
 
+    ## updating alpha-performance
+    hedge_alpha_performance.append((hedge_cum_rewards[-1] ** (1 - ALPHA) / (1 - ALPHA)).sum())
+    popf_alpha_performance.append((popf_cum_rewards[-1] ** (1 - ALPHA) / (1 - ALPHA)).sum())
+    fairCB_alpha_performance.append((fairCB_cum_rewards[-1] ** (1 - ALPHA) / (1 - ALPHA)).sum())
+
     ## update the fairness index
     hedge_fairness_index.append(jains_fairness_index(hedge_cum_rewards[-1]))
     popf_fairness_index.append(jains_fairness_index(popf_cum_rewards[-1]))
@@ -146,6 +156,7 @@ for t in tqdm(range(len(data))):
 import matplotlib.pyplot as plt
 
 PERFORMANCE_PLOT_PATH = "performance_full_information.png"
+ALPHA_PERFORMANCE_PLOT_PATH = "alpha_performance_full_information.png"
 JAINS_FAIRNESS_PLOT_PATH = "jains_index_full_information.png"
 APPROXIMATE_REGRET_PLOT_PATH = "approximate_regret_full_information.png"
 STANDARD_REGRET_PLOT_PATH = "standard_regret_full_information.png"
@@ -164,8 +175,16 @@ plt.plot(time, fairCB_performance, label="fairCB")
 plt.legend()
 plt.savefig(PERFORMANCE_PLOT_PATH)
 
-## plotting fairness
+## plotting alpha-performance
 plt.figure(1)
+plt.plot(time, hedge_alpha_performance, label="hedge")
+plt.plot(time, popf_alpha_performance, label="parallel OPF")
+plt.plot(time, fairCB_alpha_performance, label="fairCB")
+plt.legend()
+plt.savefig(ALPHA_PERFORMANCE_PLOT_PATH)
+
+## plotting fairness
+plt.figure(2)
 plt.plot(time, hedge_fairness_index, label="hedge")
 plt.plot(time, popf_fairness_index, label="parallel OPF")
 plt.plot(time, fairCB_fairness_index, label="fairCB")
@@ -173,7 +192,7 @@ plt.legend()
 plt.savefig(JAINS_FAIRNESS_PLOT_PATH)
 
 ## plotting standard regrets
-plt.figure(2)
+plt.figure(3)
 plt.plot(time, hedge_standard_regret, label="hedge")
 plt.plot(time, popf_standard_regret, label="parallel OPF")
 plt.plot(time, fairCB_standard_regret, label="fairCB")
@@ -181,7 +200,7 @@ plt.legend()
 plt.savefig(STANDARD_REGRET_PLOT_PATH)
 
 ## plotting approximate regrets
-plt.figure(3)
+plt.figure(4)
 plt.plot(time, hedge_approximate_regret, label="hedge")
 plt.plot(time, popf_approximate_regret, label="parallel OPF")
 plt.plot(time, fairCB_approximate_regret, label="fairCB")

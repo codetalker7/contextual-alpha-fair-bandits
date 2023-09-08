@@ -3,6 +3,7 @@ import pandas as pd
 import pickle
 import argparse
 import sys
+from tqdm import tqdm
 sys.path.append('/home/codetalker7/contextual-alpha-fair-bandits')
 
 parser = argparse.ArgumentParser()
@@ -63,6 +64,10 @@ parallelScaleFreePolicy = ParallelScaleFreeMAB(NUM_CONTEXTS, NUM_ARMS, ALPHA)
 scaleFree_cum_rewards = [np.ones((NUM_ARMS, ))]
 parallelScaleFree_cum_rewards = [np.ones((NUM_ARMS, ))]
 
+## alpha-performance
+scaleFree_alpha_performance = []
+parallelScaleFree_alpha_performance = []
+
 ## jain's fairness index
 scaleFree_fairness_index = []
 parallelScaleFree_fairness_index = []
@@ -75,7 +80,7 @@ parallelScaleFree_sum_rewards = [0]
 scaleFree_approximate_regret = []
 parallelScaleFree_approximate_regret = []
 
-for t in range(len(data)):
+for t in tqdm(range(len(data))):
     data_point = data.iloc[t]
     userId = int(data_point["userId"])
     movieId = int(data_point["movieId"])
@@ -104,6 +109,10 @@ for t in range(len(data)):
     scaleFree_cum_rewards.append(scaleFree_last_cum_rewards + rewards * scaleFree_char_vector)
     parallelScaleFree_cum_rewards.append(parallelScaleFree_last_cum_rewards + rewards * parallelScaleFree_char_vector)
 
+    ## updating alpha-performance
+    scaleFree_alpha_performance.append((scaleFree_cum_rewards[-1] ** (1 - ALPHA) / (1 - ALPHA)).sum()) 
+    parallelScaleFree_alpha_performance.append((parallelScaleFree_cum_rewards[-1] ** (1 - ALPHA) / (1 - ALPHA)).sum())
+
     ## update the fairness index
     scaleFree_fairness_index.append(jains_fairness_index(scaleFree_cum_rewards[-1]))
     parallelScaleFree_fairness_index.append(jains_fairness_index(parallelScaleFree_cum_rewards[-1]))
@@ -121,6 +130,7 @@ for t in range(len(data)):
 import matplotlib.pyplot as plt
 
 PERFORMANCE_PLOT_PATH = "performance_bandit_information.png"
+ALPHA_PERFORMANCE_PLOT_PATH = "alpha_performance_bandit_information.png"
 JAINS_FAIRNESS_PLOT_PATH = "jains_index_bandit_information.png"
 APPROXIMATE_REGRET_PLOT_PATH = "approximate_regret_bandit_information.png"
 
@@ -136,15 +146,22 @@ plt.plot(time, parallelScaleFree_performance, label="parallelScaleFree")
 plt.legend()
 plt.savefig(PERFORMANCE_PLOT_PATH)
 
-## plotting fairness
+## plotting alpha-performance
 plt.figure(1)
+plt.plot(time, scaleFree_alpha_performance, label="scaleFree")
+plt.plot(time, parallelScaleFree_alpha_performance, label="parallelScaleFree")
+plt.legend()
+plt.savefig(ALPHA_PERFORMANCE_PLOT_PATH)
+
+## plotting fairness
+plt.figure(2)
 plt.plot(time, scaleFree_fairness_index, label="scaleFree")
 plt.plot(time, parallelScaleFree_fairness_index, label="parallelScaleFree")
 plt.legend()
 plt.savefig(JAINS_FAIRNESS_PLOT_PATH)
 
 ## plotting regrets
-plt.figure(2)
+plt.figure(3)
 plt.plot(time, scaleFree_approximate_regret, label="scaleFree")
 plt.plot(time, parallelScaleFree_approximate_regret, label="parallelScaleFree")
 plt.legend()
