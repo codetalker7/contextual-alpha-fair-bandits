@@ -4,7 +4,11 @@ import pickle
 import argparse
 import sys
 from tqdm import tqdm
-sys.path.append('/home/codetalker7/contextual-alpha-fair-bandits')
+
+## adding path for the policy classes
+from os.path import dirname, abspath
+class_path = dirname(dirname(abspath(__file__)))
+sys.path.append(class_path)
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--ALPHA', dest='ALPHA', default=0.5, help='Fairness level')
