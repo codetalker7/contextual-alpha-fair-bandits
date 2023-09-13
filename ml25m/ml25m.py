@@ -158,12 +158,14 @@ for t in tqdm(range(len(data))):
 ## plotting
 # %matplotlib inline
 import matplotlib.pyplot as plt
+plt.style.use('seaborn-v0_8-darkgrid')
+plt.rcParams["figure.figsize"] = (5, 5)
 
-PERFORMANCE_PLOT_PATH = "performance_full_information.png"
-ALPHA_PERFORMANCE_PLOT_PATH = "alpha_performance_full_information.png"
-JAINS_FAIRNESS_PLOT_PATH = "jains_index_full_information.png"
-APPROXIMATE_REGRET_PLOT_PATH = "approximate_regret_full_information.png"
-STANDARD_REGRET_PLOT_PATH = "standard_regret_full_information.png"
+PERFORMANCE_PLOT_PATH = "performance_full_information.pdf"
+ALPHA_PERFORMANCE_PLOT_PATH = "alpha_performance_full_information.pdf"
+JAINS_FAIRNESS_PLOT_PATH = "jains_index_full_information.pdf"
+APPROXIMATE_REGRET_PLOT_PATH = "approximate_regret_full_information.pdf"
+STANDARD_REGRET_PLOT_PATH = "standard_regret_full_information.pdf"
 
 time = np.arange(1, len(data) + 1)
 
@@ -173,41 +175,54 @@ popf_performance = np.array(popf_sum_rewards)[1:] * (1 / time)
 fairCB_performance = np.array(fairCB_sum_rewards)[1:] * (1 / time)
 
 plt.figure(0)
-plt.plot(time, hedge_performance, label="hedge")
-plt.plot(time, popf_performance, label="parallel OPF")
-plt.plot(time, fairCB_performance, label="fairCB")
-plt.legend()
-plt.savefig(PERFORMANCE_PLOT_PATH)
+plt.plot(time, hedge_performance, label="Hedge")
+plt.plot(time, popf_performance, label="Parallel OPF")
+plt.plot(time, fairCB_performance, label="Fair CB")
+plt.xlabel("Time")
+plt.ylabel("Performance")
+# plt.title("Performance Plot")
+plt.savefig(PERFORMANCE_PLOT_PATH, bbox_inches='tight', pad_inches=0.01)
 
 ## plotting alpha-performance
 plt.figure(1)
-plt.plot(time, hedge_alpha_performance, label="hedge")
-plt.plot(time, popf_alpha_performance, label="parallel OPF")
-plt.plot(time, fairCB_alpha_performance, label="fairCB")
-plt.legend()
-plt.savefig(ALPHA_PERFORMANCE_PLOT_PATH)
+plt.plot(time, hedge_alpha_performance, label="Hedge")
+plt.plot(time, popf_alpha_performance, label="Parallel OPF")
+plt.plot(time, fairCB_alpha_performance, label="Fair CB")
+plt.legend(loc="upper left", fontsize="large")
+plt.xlabel("Time", fontsize="large")
+plt.ylabel("Alpha-Performance", fontsize="large")
+# plt.title("Alpha-Performance Plot (Full Information Setting)", fontsize="large")
+plt.savefig(ALPHA_PERFORMANCE_PLOT_PATH, bbox_inches='tight', pad_inches=0.01)
 
 ## plotting fairness
 plt.figure(2)
-plt.plot(time, hedge_fairness_index, label="hedge")
-plt.plot(time, popf_fairness_index, label="parallel OPF")
-plt.plot(time, fairCB_fairness_index, label="fairCB")
-plt.legend()
-plt.savefig(JAINS_FAIRNESS_PLOT_PATH)
+plt.plot(time, hedge_fairness_index, label="Hedge")
+plt.plot(time, popf_fairness_index, label="Parallel OPF")
+plt.plot(time, fairCB_fairness_index, label="Fair CB")
+plt.legend(loc="lower right", fontsize="large")
+plt.xlabel("Time", fontsize="large")
+plt.ylabel("Jain's Fairness Index", fontsize="large")
+# plt.title("Jain's Fairness Index Plot (Full Information Setting)", fontsize="large")
+plt.savefig(JAINS_FAIRNESS_PLOT_PATH, bbox_inches='tight', pad_inches=0.01)
 
 ## plotting standard regrets
 plt.figure(3)
-plt.plot(time, hedge_standard_regret, label="hedge")
-plt.plot(time, popf_standard_regret, label="parallel OPF")
-plt.plot(time, fairCB_standard_regret, label="fairCB")
-plt.legend()
-plt.savefig(STANDARD_REGRET_PLOT_PATH)
+plt.plot(time, hedge_standard_regret, label="Hedge")
+plt.plot(time, popf_standard_regret, label="Parallel OPF")
+plt.plot(time, fairCB_standard_regret, label="Fair CB")
+plt.legend(loc="upper left", fontsize="large")
+plt.xlabel("Time", fontsize="large")
+plt.ylabel("Standard Regret", fontsize="large")
+# plt.title("Standard Regret Plot (Full Information Setting)", fontsize="large")
+plt.savefig(STANDARD_REGRET_PLOT_PATH, bbox_inches='tight', pad_inches=0.01)
 
 ## plotting approximate regrets
 plt.figure(4)
-plt.plot(time, hedge_approximate_regret, label="hedge")
-plt.plot(time, popf_approximate_regret, label="parallel OPF")
-plt.plot(time, fairCB_approximate_regret, label="fairCB")
-plt.legend()
-plt.savefig(APPROXIMATE_REGRET_PLOT_PATH)
-
+plt.plot(time, hedge_approximate_regret, label="Hedge")
+plt.plot(time, popf_approximate_regret, label="Parallel OPF")
+plt.plot(time, fairCB_approximate_regret, label="Fair CB")
+plt.legend(loc="upper left", fontsize="large")
+plt.xlabel("Time", fontsize="large")
+plt.ylabel("Approximate Regret", fontsize="large")
+# plt.title("Approximate Regret Plot (Full Information Setting)", fontsize="large")
+plt.savefig(APPROXIMATE_REGRET_PLOT_PATH, bbox_inches='tight', pad_inches=0.01)

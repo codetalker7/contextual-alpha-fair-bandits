@@ -132,11 +132,13 @@ for t in tqdm(range(len(data))):
 ## plotting
 # %matplotlib inline
 import matplotlib.pyplot as plt
+plt.style.use('seaborn-v0_8-darkgrid')
+plt.rcParams["figure.figsize"] = (5, 5)
 
-PERFORMANCE_PLOT_PATH = "performance_bandit_information.png"
-ALPHA_PERFORMANCE_PLOT_PATH = "alpha_performance_bandit_information.png"
-JAINS_FAIRNESS_PLOT_PATH = "jains_index_bandit_information.png"
-APPROXIMATE_REGRET_PLOT_PATH = "approximate_regret_bandit_information.png"
+PERFORMANCE_PLOT_PATH = "performance_bandit_information.pdf"
+ALPHA_PERFORMANCE_PLOT_PATH = "alpha_performance_bandit_information.pdf"
+JAINS_FAIRNESS_PLOT_PATH = "jains_index_bandit_information.pdf"
+APPROXIMATE_REGRET_PLOT_PATH = "approximate_regret_bandit_information.pdf"
 
 time = np.arange(1, len(data) + 1)
 
@@ -145,28 +147,36 @@ scaleFree_performance = np.array(scaleFree_sum_rewards)[1:] * (1 / time)
 parallelScaleFree_performance = np.array(parallelScaleFree_sum_rewards)[1:] * (1 / time)
 
 plt.figure(0)
-plt.plot(time, scaleFree_performance, label="scaleFree")
-plt.plot(time, parallelScaleFree_performance, label="parallelScaleFree")
-plt.legend()
+plt.plot(time, scaleFree_performance, label="ScaleFreeMAB")
+plt.plot(time, parallelScaleFree_performance, label="ParallelScaleFreeMAB")
+plt.legend(loc="upper left", fontsize="large")
+plt.xlabel("Time", fontsize="large")
+plt.ylabel("Performance", fontsize="large")
 plt.savefig(PERFORMANCE_PLOT_PATH)
 
 ## plotting alpha-performance
 plt.figure(1)
-plt.plot(time, scaleFree_alpha_performance, label="scaleFree")
-plt.plot(time, parallelScaleFree_alpha_performance, label="parallelScaleFree")
-plt.legend()
-plt.savefig(ALPHA_PERFORMANCE_PLOT_PATH)
+plt.plot(time, scaleFree_alpha_performance, label="ScaleFreeMAB")
+plt.plot(time, parallelScaleFree_alpha_performance, label="ParallelScaleFreeMAB")
+plt.legend(loc="upper left", fontsize="large")
+plt.xlabel("Time", fontsize="large")
+plt.ylabel("α-Performance", fontsize="large")
+plt.savefig(ALPHA_PERFORMANCE_PLOT_PATH, bbox_inches='tight', pad_inches=0.01)
 
 ## plotting fairness
 plt.figure(2)
-plt.plot(time, scaleFree_fairness_index, label="scaleFree")
-plt.plot(time, parallelScaleFree_fairness_index, label="parallelScaleFree")
-plt.legend()
-plt.savefig(JAINS_FAIRNESS_PLOT_PATH)
+plt.plot(time, scaleFree_fairness_index, label="ScaleFreeMAB")
+plt.plot(time, parallelScaleFree_fairness_index, label="ParallelScaleFreeMAB")
+plt.legend(loc="center right", fontsize="large")
+plt.xlabel("Time", fontsize="large")
+plt.ylabel("Jain's Fairness Index", fontsize="large")
+plt.savefig(JAINS_FAIRNESS_PLOT_PATH, bbox_inches='tight', pad_inches=0.01)
 
 ## plotting regrets
 plt.figure(3)
-plt.plot(time, scaleFree_approximate_regret, label="scaleFree")
-plt.plot(time, parallelScaleFree_approximate_regret, label="parallelScaleFree")
-plt.legend()
-plt.savefig(APPROXIMATE_REGRET_PLOT_PATH)
+plt.plot(time, scaleFree_approximate_regret, label="ScaleFreeMAB")
+plt.plot(time, parallelScaleFree_approximate_regret, label="ParallelScaleFreeMAB")
+plt.legend(loc="center right", fontsize="large")
+plt.xlabel("Time", fontsize="large")
+plt.ylabel("Approximate Regret", fontsize="large")
+plt.savefig(APPROXIMATE_REGRET_PLOT_PATH, bbox_inches='tight', pad_inches=0.01)
