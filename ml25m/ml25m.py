@@ -158,6 +158,8 @@ for t in tqdm(range(len(data))):
 ## plotting
 # %matplotlib inline
 import matplotlib.pyplot as plt
+plt.rc('text', usetex=True)
+plt.rc('text.latex', preamble=r'\usepackage{amsmath}')
 plt.style.use('seaborn-v0_8-darkgrid')
 plt.rcParams["figure.figsize"] = (5, 5)
 
@@ -190,7 +192,7 @@ plt.plot(time, popf_alpha_performance, label="Parallel OPF")
 plt.plot(time, fairCB_alpha_performance, label="Fair CB")
 plt.legend(loc="upper left", fontsize="large")
 plt.xlabel("Time", fontsize="large")
-plt.ylabel("Alpha-Performance", fontsize="large")
+plt.ylabel(r"$\alpha$-Performance", fontsize="large")
 # plt.title("Alpha-Performance Plot (Full Information Setting)", fontsize="large")
 plt.savefig(ALPHA_PERFORMANCE_PLOT_PATH, bbox_inches='tight', pad_inches=0.01)
 

@@ -132,6 +132,8 @@ for t in tqdm(range(len(data))):
 ## plotting
 # %matplotlib inline
 import matplotlib.pyplot as plt
+plt.rc('text', usetex=True)
+plt.rc('text.latex', preamble=r'\usepackage{amsmath}')
 plt.style.use('seaborn-v0_8-darkgrid')
 plt.rcParams["figure.figsize"] = (5, 5)
 
@@ -160,7 +162,7 @@ plt.plot(time, scaleFree_alpha_performance, label="ScaleFreeMAB")
 plt.plot(time, parallelScaleFree_alpha_performance, label="ParallelScaleFreeMAB")
 plt.legend(loc="upper left", fontsize="large")
 plt.xlabel("Time", fontsize="large")
-plt.ylabel("α-Performance", fontsize="large")
+plt.ylabel(r'$\alpha$-Performance', fontsize="large")
 plt.savefig(ALPHA_PERFORMANCE_PLOT_PATH, bbox_inches='tight', pad_inches=0.01)
 
 ## plotting fairness
@@ -174,7 +176,7 @@ plt.savefig(JAINS_FAIRNESS_PLOT_PATH, bbox_inches='tight', pad_inches=0.01)
 
 ## plotting regrets
 plt.figure(3)
-plt.plot(time, scaleFree_approximate_regret, label="ScaleFreeMAB")
+plt.plot(time, scaleFree_approximate_regret, label=r"ScaleFreeMAB")
 plt.plot(time, parallelScaleFree_approximate_regret, label="ParallelScaleFreeMAB")
 plt.legend(loc="center right", fontsize="large")
 plt.xlabel("Time", fontsize="large")
