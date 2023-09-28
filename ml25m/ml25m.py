@@ -161,13 +161,13 @@ import matplotlib.pyplot as plt
 plt.rc('text', usetex=True)
 plt.rc('text.latex', preamble=r'\usepackage{amsmath}')
 plt.style.use('seaborn-v0_8-darkgrid')
-plt.rcParams["figure.figsize"] = (5, 5)
+plt.rcParams["figure.figsize"] = (5, 4)
 
-PERFORMANCE_PLOT_PATH = "performance_full_information.pdf"
-ALPHA_PERFORMANCE_PLOT_PATH = "alpha_performance_full_information.pdf"
-JAINS_FAIRNESS_PLOT_PATH = "jains_index_full_information.pdf"
-APPROXIMATE_REGRET_PLOT_PATH = "approximate_regret_full_information.pdf"
-STANDARD_REGRET_PLOT_PATH = "standard_regret_full_information.pdf"
+PERFORMANCE_PLOT_PATH = "plots/performance_full_information.pdf"
+ALPHA_PERFORMANCE_PLOT_PATH = "plots/alpha_performance_full_information.pdf"
+JAINS_FAIRNESS_PLOT_PATH = "plots/jains_index_full_information.pdf"
+APPROXIMATE_REGRET_PLOT_PATH = "plots/approximate_regret_full_information.pdf"
+STANDARD_REGRET_PLOT_PATH = "plots/standard_regret_full_information.pdf"
 
 time = np.arange(1, len(data) + 1)
 
@@ -177,9 +177,9 @@ popf_performance = np.array(popf_sum_rewards)[1:] * (1 / time)
 fairCB_performance = np.array(fairCB_sum_rewards)[1:] * (1 / time)
 
 plt.figure(0)
-plt.plot(time, hedge_performance, label="Hedge")
-plt.plot(time, popf_performance, label="Parallel OPF")
-plt.plot(time, fairCB_performance, label="Fair CB")
+plt.plot(time, hedge_performance, label=r"\textsc{Hedge}")
+plt.plot(time, popf_performance, label=r"\textsc{ParallelOPF}")
+plt.plot(time, fairCB_performance, label=r"\textsc{FairCB}")
 plt.xlabel("Time")
 plt.ylabel("Performance")
 # plt.title("Performance Plot")
@@ -187,9 +187,9 @@ plt.savefig(PERFORMANCE_PLOT_PATH, bbox_inches='tight', pad_inches=0.01)
 
 ## plotting alpha-performance
 plt.figure(1)
-plt.plot(time, hedge_alpha_performance, label="Hedge")
-plt.plot(time, popf_alpha_performance, label="Parallel OPF")
-plt.plot(time, fairCB_alpha_performance, label="Fair CB")
+plt.plot(time, hedge_alpha_performance, label=r"\textsc{Hedge}")
+plt.plot(time, popf_alpha_performance, label=r"\textsc{ParallelOPF}")
+plt.plot(time, fairCB_alpha_performance, label=r"\textsc{FairCB}")
 plt.legend(loc="upper left", fontsize="large")
 plt.xlabel("Time", fontsize="large")
 plt.ylabel(r"$\alpha$-Performance", fontsize="large")
@@ -198,9 +198,9 @@ plt.savefig(ALPHA_PERFORMANCE_PLOT_PATH, bbox_inches='tight', pad_inches=0.01)
 
 ## plotting fairness
 plt.figure(2)
-plt.plot(time, hedge_fairness_index, label="Hedge")
-plt.plot(time, popf_fairness_index, label="Parallel OPF")
-plt.plot(time, fairCB_fairness_index, label="Fair CB")
+plt.plot(time, hedge_fairness_index, label=r"\textsc{Hedge}")
+plt.plot(time, popf_fairness_index, label=r"\textsc{ParallelOPF}")
+plt.plot(time, fairCB_fairness_index, label=r"\textsc{FairCB}")
 plt.legend(loc="lower right", fontsize="large")
 plt.xlabel("Time", fontsize="large")
 plt.ylabel("Jain's Fairness Index", fontsize="large")
@@ -209,9 +209,9 @@ plt.savefig(JAINS_FAIRNESS_PLOT_PATH, bbox_inches='tight', pad_inches=0.01)
 
 ## plotting standard regrets
 plt.figure(3)
-plt.plot(time, hedge_standard_regret, label="Hedge")
-plt.plot(time, popf_standard_regret, label="Parallel OPF")
-plt.plot(time, fairCB_standard_regret, label="Fair CB")
+plt.plot(time, hedge_standard_regret, label=r"\textsc{Hedge}")
+plt.plot(time, popf_standard_regret, label=r"\textsc{ParallelOPF}")
+plt.plot(time, fairCB_standard_regret, label=r"\textsc{FairCB}")
 plt.legend(loc="upper left", fontsize="large")
 plt.xlabel("Time", fontsize="large")
 plt.ylabel("Standard Regret", fontsize="large")
@@ -220,9 +220,9 @@ plt.savefig(STANDARD_REGRET_PLOT_PATH, bbox_inches='tight', pad_inches=0.01)
 
 ## plotting approximate regrets
 plt.figure(4)
-plt.plot(time, hedge_approximate_regret, label="Hedge")
-plt.plot(time, popf_approximate_regret, label="Parallel OPF")
-plt.plot(time, fairCB_approximate_regret, label="Fair CB")
+plt.plot(time, hedge_approximate_regret, label=r"\textsc{Hedge}")
+plt.plot(time, popf_approximate_regret, label=r"\textsc{ParallelOPF}")
+plt.plot(time, fairCB_approximate_regret, label=r"\textsc{FairCB}")
 plt.legend(loc="upper left", fontsize="large")
 plt.xlabel("Time", fontsize="large")
 plt.ylabel("Approximate Regret", fontsize="large")
