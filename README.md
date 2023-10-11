@@ -23,7 +23,7 @@ python3 -m data_exploration --SEED=1 --ROWS=5000
 To compute the approximate-regret for any policy, the $\alpha$-fair offline benchmark must also be computed. To do this, the `offline_optimal.py` script is provided. The script needs two parameters to run: the fairness parameter (which is named $\alpha$ in the paper), which is specified using the `--ALPHA` option, and a reward parameter, specifying rewards for "bad" arms, which is specified using the `--SMALLREWARD` option (recall that in our experiments, we assign a reward of $1$ to "good" arms, and a small positive reward to "bad" arms). For our paper, we used the following values for the options:
 
 ```
-python3 -m offline_optimal --ALPHA=0.9 --SMALLREWARD=0.6
+python3 -m offline_optimal --ALPHA=0.9 --SMALLREWARD=0.2
 ```
 
 ## Running the full-information and bandit-information feedback experiments
