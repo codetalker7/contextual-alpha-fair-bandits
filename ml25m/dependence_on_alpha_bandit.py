@@ -37,10 +37,6 @@ print("CONTEXTS: ", NUM_CONTEXTS)
 print("SMALL_REWARD: ", SMALL_REWARD)
 print("SEED: ", int(args.SEED))
 
-# getting the offline optimal objectives
-with open("offline_optimal.pickle", "rb") as f:
-    offline_optimal_values = pickle.load(f)
-
 def get_rewards(movieId):
     genres = movies.loc[movieId]["genres"].split("|")
     rewards = np.zeros((NUM_ARMS, ))
