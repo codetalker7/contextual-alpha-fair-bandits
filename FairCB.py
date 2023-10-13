@@ -49,7 +49,7 @@ class FairCB(Policy):
         # solve the problem
         obj = cp.Minimize(objective_function)
         problem = cp.Problem(obj, constraints)
-        problem.solve()
+        problem.solve(solver='SCS')
 
         # update ps
         for context_id in range(self.num_contexts):
