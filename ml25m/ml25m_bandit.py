@@ -23,6 +23,10 @@ parallelScaleFree_fairness_index = []
 scaleFree_sum_rewards = [0]
 parallelScaleFree_sum_rewards = [0]
 
+## standard regrets
+scaleFree_standard_regret = []
+parallelScaleFree_standard_regret = []
+
 ## approximate regrets
 scaleFree_approximate_regret = []
 parallelScaleFree_approximate_regret = []
@@ -64,6 +68,10 @@ for t in tqdm(range(len(data))):
     scaleFree_fairness_index.append(jains_fairness_index(scaleFree_cum_rewards[-1]))
     parallelScaleFree_fairness_index.append(jains_fairness_index(parallelScaleFree_cum_rewards[-1]))
 
+    ## update the standard regrets
+    scaleFree_standard_regret.append(offline_optimal_values[t] - ((scaleFree_cum_rewards[-1] ** (1 - ALPHA)) / (1 - ALPHA)).sum())
+    parallelScaleFree_standard_regret.append(offline_optimal_values[t] - ((parallelScaleFree_cum_rewards[-1] ** (1 - ALPHA)) / (1 - ALPHA)).sum())
+
     ## update the approximate regrets
     scaleFree_approximate_regret.append(offline_optimal_values[t] - APPROX_FACTOR * ((scaleFree_cum_rewards[-1] ** (1 - ALPHA)) / (1 - ALPHA)).sum())
     parallelScaleFree_approximate_regret.append(offline_optimal_values[t] - APPROX_FACTOR * ((parallelScaleFree_cum_rewards[-1] ** (1 - ALPHA)) / (1 - ALPHA)).sum())
@@ -83,6 +91,7 @@ plt.rcParams["figure.figsize"] = (5, 4)
 PERFORMANCE_PLOT_PATH = "plots/performance_bandit_information.pdf"
 ALPHA_PERFORMANCE_PLOT_PATH = "plots/alpha_performance_bandit_information.pdf"
 JAINS_FAIRNESS_PLOT_PATH = "plots/jains_index_bandit_information.pdf"
+STANDARD_REGRET_PLOT_PATH = "plots/standard_regret_bandit_information.pdf"
 APPROXIMATE_REGRET_PLOT_PATH = "plots/approximate_regret_bandit_information.pdf"
 
 time = np.arange(1, len(data) + 1)
@@ -112,13 +121,22 @@ plt.savefig(ALPHA_PERFORMANCE_PLOT_PATH, bbox_inches='tight', pad_inches=0.01)
 plt.figure(2)
 plt.plot(time, scaleFree_fairness_index, label="Putta \& Aggarwal, 2022")
 plt.plot(time, parallelScaleFree_fairness_index, label=r"$\alpha\textsc{-FairCB}$")
-plt.legend(loc="center right", fontsize="large")
+plt.legend(loc="lower left", fontsize="large")
 plt.xlabel("Time", fontsize="large")
 plt.ylabel("Jain's Fairness Index", fontsize="large")
 plt.savefig(JAINS_FAIRNESS_PLOT_PATH, bbox_inches='tight', pad_inches=0.01)
 
-## plotting regrets
+## plotting standard regrets
 plt.figure(3)
+plt.plot(time, scaleFree_standard_regret, label="Putta \& Aggarwal, 2022")
+plt.plot(time, parallelScaleFree_standard_regret, label=r"$\alpha\textsc{-FairCB}$")
+plt.legend(loc="center right", fontsize="large")
+plt.xlabel("Time", fontsize="large")
+plt.ylabel("Standard Regret", fontsize="large")
+plt.savefig(STANDARD_REGRET_PLOT_PATH, bbox_inches='tight', pad_inches=0.01)
+
+## plotting approximate regrets
+plt.figure(4)
 plt.plot(time, scaleFree_approximate_regret, label="Putta \& Aggarwal, 2022")
 plt.plot(time, parallelScaleFree_approximate_regret, label=r"$\alpha\textsc{-FairCB}$")
 plt.legend(loc="center right", fontsize="large")
