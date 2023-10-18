@@ -49,6 +49,14 @@ def get_rewards(movieId):
 
     return rewards
 
+## map userId's to an index in the range [0, NUM_CONTEXTS - 1]
+user_ids = sorted(list(data["userId"].unique()))
+map_user_to_index = dict()
+index = 0
+for user_id in user_ids:
+    map_user_to_index[user_id] = index
+    index += 1
+
 ## running the policies
 from ParallelScaleFreeMAB import ParallelScaleFreeMAB
 from utils import jains_fairness_index
@@ -61,6 +69,9 @@ for t in tqdm(range(len(data))):
     data_point = data.iloc[t]
     userId = int(data_point["userId"])
     movieId = int(data_point["movieId"])
+
+    # map user id to an index in the range [0, NUM_CONTEXTS - 1]
+    userId = map_user_to_index[userId]
 
     recommended_genres = [policies[i].decision(userId - 1) for i in range(len(alphas))]
 
