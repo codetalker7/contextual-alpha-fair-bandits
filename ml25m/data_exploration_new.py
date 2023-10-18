@@ -1,6 +1,7 @@
 import pandas as pd
 import argparse
 
+parser = argparse.ArgumentParser()
 parser.add_argument('--SEED', dest='SEED', default=42, help='Random seed to shuffle the dataset.')
 parser.add_argument('--USETIMESTAMPS', dest='USETIMESTAMPS', default=False, help='Boolean determining whether the timestamps given in the dataset will be used to shuffle the rows.')
 args = parser.parse_args()
