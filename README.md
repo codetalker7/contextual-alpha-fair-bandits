@@ -9,6 +9,12 @@ The dependencies are listed in `requirements.txt`. To install them, use your fav
 python3 -m pip install -r requirements.txt
 ```
 
+To generate plots, we also use the `texlive` distribution along with a few additional packages. On Linux machines, this could be installed via the following: 
+
+```
+sudo apt install texlive-fonts-recommended texlive-fonts-extra cm-super dvipng
+```
+
 # Running experiments on the [MovieLens 25M](https://grouplens.org/datasets/movielens/25m/) dataset
 
 ## Preparing the data
@@ -41,4 +47,7 @@ python3 -m ml25m --ALPHA=0.9 --SMALLREWARD=0.2
 ```
 
 <!-- For Hedge algorithm, see this link: http://www.columbia.edu/~cs2035/courses/ieor6614.S16/mw.pdf. -->
+
+## Experiments for varying values of $\alpha$
+
 
