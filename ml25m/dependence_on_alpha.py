@@ -70,6 +70,9 @@ for t in tqdm(range(len(data))):
     userId = int(data_point["userId"])
     movieId = int(data_point["movieId"])
 
+    # map user id to an index in the range [0, NUM_CONTEXTS - 1]
+    userId = map_user_to_index[userId]
+
     recommended_genres = [policies[i].decision(userId - 1) for i in range(len(alphas))]
 
     ## get rewards corresponding to the movie
