@@ -50,4 +50,15 @@ python3 -m ml25m_bandit --ALPHA=0.9 --SMALLREWARD=0.2
 
 ## Experiments for varying values of $\alpha$
 
+For experiments when the value of $\alpha$ varies in the interval $[0, 1)$, we need contexts (users) which have a high frequency in the dataset. This is needed for our bandit algorithm, since our algorithm uses a subroutine which has an exploration component; if the frequency of a context is very less, then the subroutine for this context will still be in an exploration phase. For this, we have the `data_exploration_new.py` script, which has a new `--FREQUENCY` option. This option gets only those contexts out of the dataset which have a frequency higher than the specified value of this option. For the paper, we ran this script as follows:
 
+```
+python3 -m data_exploration_new --SEED=1 --FREQUENCY=5000
+```
+
+Then, we run the `dependence_on_alpha.py` and `dependence_on_alpha_bandit.py` scripts, which run a few experiments for varying value of `alpha` for the full information and bandit settings respectively. For the paper, we ran these scripts as follows:
+
+```
+python3 -m dependence_on_alpha --SMALLREWARD=0.2
+python3 -m dependence_on_alpha_bandit --SMALLREWARD=0.001
+```
