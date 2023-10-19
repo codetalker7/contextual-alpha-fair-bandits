@@ -49,6 +49,14 @@ def get_rewards(movieId):
 
     return rewards
 
+## map userId's to an index in the range [0, NUM_CONTEXTS - 1]
+user_ids = sorted(list(data["userId"].unique()))
+map_user_to_index = dict()
+index = 0
+for user_id in user_ids:
+    map_user_to_index[user_id] = index
+    index += 1
+
 ## running the policies
 from ParallelOPF import ParallelOPF
 from utils import jains_fairness_index
