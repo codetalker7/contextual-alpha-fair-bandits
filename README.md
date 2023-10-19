@@ -18,10 +18,10 @@ sudo apt install texlive-fonts-recommended texlive-fonts-extra cm-super dvipng
 # Running experiments on the [MovieLens 25M](https://grouplens.org/datasets/movielens/25m/) dataset
 
 ## Preparing the data
-The `ml25m` directory contains experiments for the [MovieLens 25M](https://grouplens.org/datasets/movielens/25m/) dataset. `cd` into the `ml25m` folder. You may use the `get_data.sh` script to download and extract the dataset. Before running the experiments, use the `data_exploration.py` script to prepare the data needed to run the experiments. You may use the option `--ROWS` to specify the number of rows of the dataset to be used in the experiments; for the experiments in the paper, the first 5000 rows of the dataset were used. Also, the `data_exploration.py` script shuffles the specified number of rows randomly (this is done to create an interesting arrival sequence). For reproducability, use the `--SEED` option to specify the random seed to do the shuffling. For the paper, the following values for the options were used:
+The `ml25m` directory contains experiments for the [MovieLens 25M](https://grouplens.org/datasets/movielens/25m/) dataset. `cd` into the `ml25m` folder. You may use the `get_data.sh` script to download and extract the dataset. Before running the experiments, use the `data_exploration.py` script to prepare the data needed to run the experiments. You may use the option `--ROWS` to specify the number of rows of the dataset to be used in the experiments; for the experiments in the paper, the first 5000 rows of the dataset were used. Also, the `data_exploration.py` script shuffles the specified number of rows randomly (this is done to create an interesting arrival sequence). For reproducability, use the `--SEED` option to specify the random seed to do the shuffling. Also, the `--USETIMESTAMPS` true option can be specified to `True` (and leave the option to specify it to `False`), if the dataset is to be sorted by timestamps. For the paper, we used the following to run the script:
 
 ```
-python3 -m data_exploration --SEED=1 --ROWS=5000
+python3 -m data_exploration --SEED=1 --ROWS=5000 --USETIMESTAMPS=True
 ```
 
 ## Computing the offline benchmark
@@ -43,7 +43,7 @@ python3 -m ml25m --ALPHA=0.9 --SMALLREWARD=0.2
 The experiments for the bandit-information feedback setting are given in the `ml25m_bandit.py` script, and is similar to the `ml25m.py` script for the full-information setting. For the paper, it was run as follows:
 
 ```
-python3 -m ml25m --ALPHA=0.9 --SMALLREWARD=0.2
+python3 -m ml25m_bandit --ALPHA=0.9 --SMALLREWARD=0.2
 ```
 
 <!-- For Hedge algorithm, see this link: http://www.columbia.edu/~cs2035/courses/ieor6614.S16/mw.pdf. -->
