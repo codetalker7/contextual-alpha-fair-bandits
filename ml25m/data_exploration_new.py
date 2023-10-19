@@ -3,6 +3,7 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--SEED', dest='SEED', default=42, help='Random seed to shuffle the dataset.')
+parser.add_argument('--FREQUENCY', dest='FREQUENCY', default=5000, help='Minimum frequency of a context in the resultant dataset.')
 parser.add_argument('--USETIMESTAMPS', dest='USETIMESTAMPS', default=False, help='Boolean determining whether the timestamps given in the dataset will be used to shuffle the rows.')
 args = parser.parse_args()
 
@@ -11,13 +12,15 @@ movies = pd.read_csv("data/ml-25m/movies.csv")
 movies = movies.set_index("movieId")
 
 SEED = int(args.SEED)
+FREQUENCY = int(args.FREQUENCY)
 USETIMESTAMPS = bool(args.USETIMESTAMPS)
 
 print("Use timestamps to shuffle rows?: ", USETIMESTAMPS)
 print("Random seed to shuffle dataset (if USETIMESTAMPS is false): ", SEED)
+print("Minimum Frequency Required: ", FREQUENCY)
 
 # high frequency users
-high_frequency_users_dict = dict(filter(lambda x: x[1] >= 5000, dict(data['userId'].value_counts()).items()))
+high_frequency_users_dict = dict(filter(lambda x: x[1] >= FREQUENCY, dict(data['userId'].value_counts()).items()))
 high_frequency_users = list(high_frequency_users_dict.keys())
 data = data[data['userId'].isin(high_frequency_users)]
 
