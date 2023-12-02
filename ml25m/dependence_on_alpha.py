@@ -57,13 +57,22 @@ for user_id in user_ids:
     map_user_to_index[user_id] = index
     index += 1
 
+## getting the context distribution for fairCB
+valueCounts = data["userId"].value_counts()
+context_distribution = np.zeros((NUM_CONTEXTS, ))
+for user_id in user_ids:
+    context_distribution[map_user_to_index[user_id]] = valueCounts.loc[user_id] / len(data)
+
 ## running the policies
 from ParallelOPF import ParallelOPF
+from FairCB import FairCB
 from utils import jains_fairness_index
 
 policies = [ParallelOPF(NUM_CONTEXTS, NUM_ARMS, alphas[i]) for i in range(len(alphas))]
+faircb_policies = [FairCB(NUM_CONTEXTS, NUM_ARMS, alphas[i] / len(data), len(data), context_distribution) for i in range(len(alphas))] 
 
 cumulative_rewards = [[np.ones(NUM_ARMS, )] for i in range(len(alphas))]
+faircb_cumulative_rewards = [[np.ones(NUM_ARMS, )] for i in range(len(alphas))]
 
 for t in tqdm(range(len(data))):
     data_point = data.iloc[t]
@@ -74,6 +83,7 @@ for t in tqdm(range(len(data))):
     userId = map_user_to_index[userId]
 
     recommended_genres = [policies[i].decision(userId - 1) for i in range(len(alphas))]
+    faircb_recommended_genres = [faircb_policies[i].decision(userId - 1) for i in range(len(alphas))]
 
     ## get rewards corresponding to the movie
     rewards = get_rewards(movieId)
@@ -83,9 +93,13 @@ for t in tqdm(range(len(data))):
         last_cum_rewards = cumulative_rewards[i][-1]
         cumulative_rewards[i].append(last_cum_rewards + rewards * policies[i].last_decision)
 
+        faircb_last_cum_rewards = faircb_cumulative_rewards[i][-1]
+        faircb_cumulative_rewards[i].append(faircb_last_cum_rewards + rewards * faircb_policies[i].last_decision)
+
     ## feedback rewards to the policies
     for i in range(len(alphas)):
         policies[i].feedback(rewards)
+        faircb_policies[i].feedback(rewards)
 
 ## plotting
 # %matplotlib inline
@@ -100,21 +114,24 @@ ALPHA_FAIR_OBJECTIVE_VARIATION_PATH = "plots/alpha_objective_variation.pdf"
 FAIRNESS_VARIATION_PATH = "plots/fairness_variation.pdf" 
 
 plt.figure(0)
-plt.plot(alphas, [cumulative_rewards[i][-1].sum() / NUM_ARMS for i in range(len(alphas))])
+plt.plot(alphas, [cumulative_rewards[i][-1].sum() / NUM_ARMS for i in range(len(alphas))], label=r"$\alpha$-\textsc{FairCB}")
+plt.plot(alphas, [faircb_cumulative_rewards[i][-1].sum() / NUM_ARMS for i in range(len(alphas))], label=r"\textsc{FairCB}")
 plt.legend(loc="upper left", fontsize="large")
 plt.xlabel(r"$\alpha$", fontsize="large")
 plt.ylabel("Average Cumulative Rewards", fontsize="large")
 plt.savefig(AVERAGED_CUMULATIVE_REWARDS_PATH)
 
 plt.figure(1)
-plt.plot(alphas, [(cumulative_rewards[i][-1] ** (1 - alphas[i]) / (1 - alphas[i])).sum() for i in range(len(alphas))])
+plt.plot(alphas, [(cumulative_rewards[i][-1] ** (1 - alphas[i]) / (1 - alphas[i])).sum() for i in range(len(alphas))], label=r"$\alpha$-\textsc{FairCB}")
+plt.plot(alphas, [(faircb_cumulative_rewards[i][-1] ** (1 - alphas[i]) / (1 - alphas[i])).sum() for i in range(len(alphas))], label=r"\textsc{FairCB}")
 plt.legend(loc="upper left", fontsize="large")
 plt.xlabel(r"$\alpha$", fontsize="large")
 plt.ylabel(r"$\alpha$-fair objective", fontsize="large")
 plt.savefig(ALPHA_FAIR_OBJECTIVE_VARIATION_PATH)
 
 plt.figure(2)
-plt.plot(alphas, [jains_fairness_index(cumulative_rewards[i][-1]) for i in range(len(alphas))])
+plt.plot(alphas, [jains_fairness_index(cumulative_rewards[i][-1]) for i in range(len(alphas))], label=r"$\alpha$-\textsc{FairCB}")
+plt.plot(alphas, [jains_fairness_index(faircb_cumulative_rewards[i][-1]) for i in range(len(alphas))], label=r"\textsc{FairCB}")
 plt.legend(loc="upper left", fontsize="large")
 plt.xlabel(r"$\alpha$", fontsize="large")
 plt.ylabel(r"Jain's Fairness Index", fontsize="large")
