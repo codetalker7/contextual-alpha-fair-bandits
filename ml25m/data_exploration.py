@@ -1,19 +1,20 @@
 import pandas as pd
-import argparse
-
-parser = argparse.ArgumentParser()
-parser.add_argument('--ROWS', dest='ROWS', default=50000, help='Number of rows of the dataset to use.')
-parser.add_argument('--SEED', dest='SEED', default=42, help='Random seed to shuffle the dataset.')
-parser.add_argument('--USETIMESTAMPS', dest='USETIMESTAMPS', default=False, help='Boolean determining whether the timestamps given in the dataset will be used to shuffle the rows.')
-args = parser.parse_args()
+import pickle
+import json 
 
 data = pd.read_csv("data/ml-25m/ratings.csv")
 movies = pd.read_csv("data/ml-25m/movies.csv")
 movies = movies.set_index("movieId")
 
-ROWS = int(args.ROWS)
-SEED = int(args.SEED)
-USETIMESTAMPS = bool(args.USETIMESTAMPS)
+with open('config.json', 'r') as f:
+    config_dict = json.load(f)
+
+ROWS = int(config_dict["ROWS"])
+SEED = int(config_dict["SEED"])
+if (config_dict["USETIMESTAMPS"] == 'True'):
+    USETIMESTAMPS = True
+else:
+    USETIMESTAMPS = False
 
 print("Number of rows to use: ", ROWS)
 print("Use timestamps to shuffle rows?: ", USETIMESTAMPS)
@@ -48,15 +49,31 @@ for i in range(len(data)):
     for category in movie_categories:
         categories.add(category)
 
-# printing the stats
-print("Number of contexts: ", len(data["userId"].unique()))
-print("Number of arms:", len(list(categories)))
+# printing and saving the stats
+stats_dict = {
+    "NUM_CONTEXTS": len(data["userId"].unique()),
+    "NUM_ARMS": len(list(categories)),
+}
+print("Number of contexts: ", stats_dict["NUM_CONTEXTS"])
+print("Number of arms:", stats_dict["NUM_ARMS"])
 
-# saving the data to work with it later
-import pickle
+with open('stats.json', 'w') as f:
+    json.dump(stats_dict, f)
 
-DATAPATH = "data.pickle"
-CATEGORIES_PATH = "categories.pickle"
+# creating maps from user to index, and vice-versa
+user_ids = sorted(list(data["userId"].unique()))
+map_user_to_index = dict()
+map_index_to_user = dict()
+index = 0
+for user_id in user_ids:
+    map_user_to_index[user_id] = index
+    map_index_to_user[index] = user_id
+    index += 1
+
+DATAPATH = "pickled_files/data.pickle"
+CATEGORIES_PATH = "pickled_files/categories.pickle"
+USER_TO_INDEX_PATH = "pickled_files/user_to_index.pickle"
+INDEX_TO_USER_PATH = "pickled_files/index_to_user.pickle"
 
 with open(DATAPATH, 'wb') as f:
     pickle.dump(data, f)
@@ -64,4 +81,8 @@ with open(DATAPATH, 'wb') as f:
 with open(CATEGORIES_PATH, 'wb') as f:
     pickle.dump(list(categories), f)
 
+with open(USER_TO_INDEX_PATH, 'wb') as f:
+    pickle.dump(map_user_to_index, f)
 
+with open(INDEX_TO_USER_PATH, 'wb') as f:
+    pickle.dump(map_index_to_user, f)

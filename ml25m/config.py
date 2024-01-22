@@ -11,12 +11,12 @@ parser.add_argument('--FREQUENCY', dest='FREQUENCY', default=5000, help='Minimum
 
 args = parser.parse_args()
 config_dict = {
-    "ROWS": args.ROWS,
-    "SEED": args.SEED,
-    "ALPHA": args.ALPHA,
-    "SMALLREWARD": args.SMALL_REWARD,
+    "ROWS": int(args.ROWS),
+    "SEED": int(args.SEED),
+    "ALPHA": float(args.ALPHA),
+    "SMALLREWARD": float(args.SMALL_REWARD),
     "USETIMESTAMPS": args.USETIMESTAMPS,
-    "FREQUENCY": args.FREQUENCY,
+    "FREQUENCY": int(args.FREQUENCY),
 }
 
 ## save the config
