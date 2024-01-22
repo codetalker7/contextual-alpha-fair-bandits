@@ -70,19 +70,14 @@ for user_id in user_ids:
     map_index_to_user[index] = user_id
     index += 1
 
-DATAPATH = "pickled_files/data.pickle"
-CATEGORIES_PATH = "pickled_files/categories.pickle"
-USER_TO_INDEX_PATH = "pickled_files/user_to_index.pickle"
-INDEX_TO_USER_PATH = "pickled_files/index_to_user.pickle"
-
-with open(DATAPATH, 'wb') as f:
+with open(config_dict["DATAPATH"], 'wb') as f:
     pickle.dump(data, f)
 
-with open(CATEGORIES_PATH, 'wb') as f:
+with open(config_dict["CATEGORIES_PATH"], 'wb') as f:
     pickle.dump(list(categories), f)
 
-with open(USER_TO_INDEX_PATH, 'wb') as f:
+with open(config_dict["USER_TO_INDEX_PATH"], 'wb') as f:
     pickle.dump(map_user_to_index, f)
 
-with open(INDEX_TO_USER_PATH, 'wb') as f:
+with open(config_dict["INDEX_TO_USER_PATH"], 'wb') as f:
     pickle.dump(map_index_to_user, f)

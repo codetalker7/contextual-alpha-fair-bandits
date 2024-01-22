@@ -17,6 +17,10 @@ config_dict = {
     "SMALLREWARD": float(args.SMALL_REWARD),
     "USETIMESTAMPS": args.USETIMESTAMPS,
     "FREQUENCY": int(args.FREQUENCY),
+    "DATAPATH": "pickled_files/data.pickle",
+    "CATEGORIES_PATH": "pickled_files/categories.pickle",
+    "USER_TO_INDEX_PATH": "pickled_files/user_to_index.pickle",
+    "INDEX_TO_USER_PATH": "pickled_files/index_to_user.pickle",
 }
 
 ## save the config
