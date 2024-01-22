@@ -42,7 +42,7 @@ SEED = int(config_dict["SEED"])
 ALPHA = float(config_dict["ALPHA"])
 SMALL_REWARD = float(config_dict["SMALLREWARD"])
 APPROX_FACTOR = (1 - ALPHA) ** (-(1 - ALPHA)) 
-if (config_dict["USETIMESTAMPS"] == 'True'):
+if (config_dict["USETIMESTAMPS"]): 
     USETIMESTAMPS = True
 else:
     USETIMESTAMPS = False

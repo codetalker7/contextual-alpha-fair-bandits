@@ -1,12 +1,8 @@
 from driver import *
 
-## map userId's to an index in the range [0, NUM_CONTEXTS - 1]
-user_ids = sorted(list(data["userId"].unique()))
-map_user_to_index = dict()
-index = 0
-for user_id in user_ids:
-    map_user_to_index[user_id] = index
-    index += 1
+## getting the offline optimal objectives
+with open(OFFLINE_OPTIMAL_FILE, "rb") as f:
+    offline_optimal_values = pickle.load(f)
 
 ## running the policies
 from Hedge import Hedge
@@ -18,99 +14,89 @@ from utils import jains_fairness_index
 valueCounts = data["userId"].value_counts()
 context_distribution = np.zeros((NUM_CONTEXTS, ))
 for context_id in range(NUM_CONTEXTS):
-    context_distribution[context_id] = valueCounts.loc[context_id + 1] / len(data)
+    context_distribution[context_id] = valueCounts.loc[map_index_to_user[context_id]] / len(data)
 
-## initialize policies
-hedge = Hedge(NUM_CONTEXTS, NUM_ARMS, len(data))
-parallelOPF = ParallelOPF(NUM_CONTEXTS, NUM_ARMS, ALPHA)
-fairCB = FairCB(NUM_CONTEXTS, NUM_ARMS, 1 / (2 * NUM_ARMS), len(data), context_distribution)
+policies = [
+    Hedge(NUM_CONTEXTS, NUM_ARMS, len(data)),
+    ParallelOPF(NUM_CONTEXTS, NUM_ARMS, ALPHA),
+    FairCB(NUM_CONTEXTS, NUM_ARMS, config_dict["FAIRCBFAIRNESS"] / NUM_ARMS, len(data), context_distribution)
+]
 
 ## keeping track of cumulative rewards
-hedge_cum_rewards = [np.ones((NUM_ARMS, ))]
-popf_cum_rewards = [np.ones((NUM_ARMS, ))]
-fairCB_cum_rewards = [np.ones((NUM_ARMS, ))]
+cumulative_rewards = [[np.ones(NUM_ARMS, )] for i in range(len(policies))]
 
 ## alpha-performance
-hedge_alpha_performance = []
-popf_alpha_performance = []
-fairCB_alpha_performance = []
+alpha_performance = [[] for i in range(len(policies))]
 
 ## jain's fairness index
-hedge_fairness_index = []
-popf_fairness_index = []
-fairCB_fairness_index = []
+fairness_index = [[] for i in range(len(policies))]
 
 ## sum of rewards
-hedge_sum_rewards = [0]
-popf_sum_rewards = [0]
-fairCB_sum_rewards = [0]
+sum_rewards = [[0] for i in range(len(policies))]
 
 ## standard regrets
-hedge_standard_regret = []
-popf_standard_regret = []
-fairCB_standard_regret = []
+standard_regrets = [[] for i in range(len(policies))]
 
 ## approximate regrets
-hedge_approximate_regret = []
-popf_approximate_regret = []
-fairCB_approximate_regret = []
+approximate_regrets = [[] for i in range(len(policies))]
 
 for t in tqdm(range(len(data))):
     data_point = data.iloc[t]
     userId = int(data_point["userId"])
     movieId = int(data_point["movieId"])
 
-    hedge_recommended_genre = hedge.decision(userId - 1)    # context labels start from 0
-    popf_recommended_genre = parallelOPF.decision(userId - 1)
-    fairCB_recommended_genre = fairCB.decision(userId - 1)
+    recommended_genres = [policies[i].decision(map_user_to_index[userId]) for i in range(len(policies))]
 
     ## get rewards corresponding to the movie
-    rewards = get_rewards(movieId)
+    rewards = reward_function(movieId)
 
     ## update performance
-    hedge_sum_rewards.append(hedge_sum_rewards[-1] + rewards[hedge_recommended_genre - 1])
-    popf_sum_rewards.append(popf_sum_rewards[-1] + rewards[popf_recommended_genre - 1])
-    fairCB_sum_rewards.append(fairCB_sum_rewards[-1] + rewards[fairCB_recommended_genre - 1])
+    for i in range(len(policies)):
+        sum_rewards[i].append(sum_rewards[i][-1] + rewards[recommended_genres[i] - 1])
 
-    ## update cum rewards
-    hedge_last_cum_rewards = hedge_cum_rewards[-1]
-    popf_last_cum_rewards = popf_cum_rewards[-1]
-    fairCB_last_cum_rewards = fairCB_cum_rewards[-1]
-
-    hedge_cum_rewards.append(hedge_last_cum_rewards + rewards * (hedge.weights / np.sum(hedge.weights)))
-    popf_cum_rewards.append(popf_last_cum_rewards + rewards * parallelOPF.last_decision)
-    fairCB_cum_rewards.append(fairCB_last_cum_rewards + rewards * fairCB.last_decision)
+    ## update cumulative rewards
+    for i in range(len(policies)):
+        last_cum_rewards = cumulative_rewards[i][-1]
+        if i == 0:
+            # hedge
+            cumulative_rewards[i].append(last_cum_rewards + rewards * (policies[i].weights / np.sum(policies[i].weights)))
+        else:
+            cumulative_rewards[i].append(last_cum_rewards + rewards * policies[i].last_decision)
 
     ## updating alpha-performance
-    hedge_alpha_performance.append((hedge_cum_rewards[-1] ** (1 - ALPHA) / (1 - ALPHA)).sum())
-    popf_alpha_performance.append((popf_cum_rewards[-1] ** (1 - ALPHA) / (1 - ALPHA)).sum())
-    fairCB_alpha_performance.append((fairCB_cum_rewards[-1] ** (1 - ALPHA) / (1 - ALPHA)).sum())
+    for i in range(len(policies)):
+        last_cum_rewards = cumulative_rewards[i][-1]
+        alpha_performance[i].append((last_cum_rewards ** (1 - ALPHA) / (1 - ALPHA)).sum())
 
     ## update the fairness index
-    hedge_fairness_index.append(jains_fairness_index(hedge_cum_rewards[-1]))
-    popf_fairness_index.append(jains_fairness_index(popf_cum_rewards[-1]))
-    fairCB_fairness_index.append(jains_fairness_index(fairCB_cum_rewards[-1]))
+    for i in range(len(policies)):
+        last_cum_rewards = cumulative_rewards[i][-1]
+        fairness_index[i].append(jains_fairness_index(last_cum_rewards))
 
     ## update the standard regrets
-    hedge_standard_regret.append(offline_optimal_values[t] - ((hedge_cum_rewards[-1] ** (1 - ALPHA)) / (1 - ALPHA)).sum())
-    popf_standard_regret.append(offline_optimal_values[t] - ((popf_cum_rewards[-1] ** (1 - ALPHA)) / (1 - ALPHA)).sum())
-    fairCB_standard_regret.append(offline_optimal_values[t] - ((fairCB_cum_rewards[-1] ** (1 - ALPHA)) / (1 - ALPHA)).sum())
-
+    for i in range(len(policies)):
+        last_cum_rewards = cumulative_rewards[i][-1]
+        standard_regrets[i].append(offline_optimal_values[t] - (last_cum_rewards ** (1 - ALPHA) / (1 - ALPHA)).sum())
     ## update the approximate regret
-    hedge_approximate_regret.append(offline_optimal_values[t] - APPROX_FACTOR * ((hedge_cum_rewards[-1] ** (1 - ALPHA)) / (1 - ALPHA)).sum())
-    popf_approximate_regret.append(offline_optimal_values[t] - APPROX_FACTOR * ((popf_cum_rewards[-1] ** (1 - ALPHA)) / (1 - ALPHA)).sum())
-    fairCB_approximate_regret.append(offline_optimal_values[t] - APPROX_FACTOR * ((fairCB_cum_rewards[-1] ** (1 - ALPHA)) / (1 - ALPHA)).sum())
+    for i in range(len(policies)):
+        last_cum_rewards = cumulative_rewards[i][-1]
+        approximate_regrets[i].append(offline_optimal_values[t] - APPROX_FACTOR * (last_cum_rewards ** (1 - ALPHA) / (1 - ALPHA)).sum())
 
     ## feedback rewards to the policies
-    hedge.feedback(rewards)
-    parallelOPF.feedback(rewards)
-    fairCB.feedback(rewards)
+    for i in range(len(policies)):
+        policies[i].feedback(rewards)
 
 ## plotting
 # %matplotlib inline
 import matplotlib.pyplot as plt
-plt.rc('text', usetex=True)
-plt.rc('text.latex', preamble=r'\usepackage{amsmath}')
+USETEXLIVE = config_dict["USETEXLIVE"]
+
+if USETEXLIVE:
+    plt.rc('text', usetex=True)
+    plt.rc('text.latex', preamble=r'\usepackage{amsmath}')
+    labels = [r"\textsc{Hedge}", r"$\alpha$\textsc{-FairCB}", r"\textsc{FairCB}"]
+else:
+    labels = ["Hedge", "alpha-FairCB", "FairCB"]
 plt.style.use('seaborn-v0_8-darkgrid')
 plt.rcParams["figure.figsize"] = (5, 4)
 
@@ -123,65 +109,69 @@ STANDARD_REGRET_PLOT_PATH = "plots/standard_regret_full_information.pdf"
 time = np.arange(1, len(data) + 1)
 
 ## plotting performance
-hedge_performance = np.array(hedge_sum_rewards)[1:] * (1 / time)
-popf_performance = np.array(popf_sum_rewards)[1:] * (1 / time)
-fairCB_performance = np.array(fairCB_sum_rewards)[1:] * (1 / time)
+performance = [np.array(sum_rewards[i][1:]) * (1 / time) for i in range(len(policies))]
 
 plt.figure(0)
-plt.plot(time, hedge_performance, label=r"\textsc{Hedge}")
-plt.plot(time, popf_performance, label=r"$\alpha$\textsc{-FairCB}")
-plt.plot(time, fairCB_performance, label=r"\textsc{FairCB}")
+ax = plt.axes()
+for i in range(len(policies)):
+    plt.plot(time, performance[i], label=labels[i])
 plt.xlabel("Time")
 plt.ylabel("Performance")
+# if USETEXLIVE:
+#     plt.text(0.5, 0.95, f"$\\alpha={ALPHA}$, $\\nu = {config_dict['FAIRCBFAIRNESS']}$, $\\delta={SMALL_REWARD}$", horizontalalignment='center', verticalalignment='center', transform=ax.transAxes)
 # plt.title("Performance Plot")
 plt.savefig(PERFORMANCE_PLOT_PATH, bbox_inches='tight', pad_inches=0.01)
 
 ## plotting alpha-performance
 plt.figure(1)
-plt.plot(time, hedge_alpha_performance, label=r"\textsc{Hedge}")
-plt.plot(time, popf_alpha_performance, label=r"$\alpha$\textsc{-FairCB}")
-plt.plot(time, fairCB_alpha_performance, label=r"\textsc{FairCB}")
+ax = plt.axes()
+for i in range(len(policies)):
+    plt.plot(time, alpha_performance[i], label=labels[i])
 plt.legend(loc="upper left", fontsize="large")
 plt.xlabel("Time", fontsize="large")
-plt.ylabel(r"$\alpha$-Performance", fontsize="large")
+if USETEXLIVE:
+    # plt.text(0.5, 0.95, f"$\\alpha={ALPHA}$, $\\nu = {config_dict['FAIRCBFAIRNESS']}$, $\\delta={SMALL_REWARD}$", horizontalalignment='center', verticalalignment='center', transform=ax.transAxes)
+    plt.ylabel(r"$\alpha$-Performance", fontsize="large")
+else:
+    plt.ylabel("alpha-Performance", fontsize="large")
 # plt.title("Alpha-Performance Plot (Full Information Setting)", fontsize="large")
 plt.savefig(ALPHA_PERFORMANCE_PLOT_PATH, bbox_inches='tight', pad_inches=0.01)
 
 ## plotting fairness
 plt.figure(2)
 ax = plt.axes()
-plt.plot(time, hedge_fairness_index, label=r"\textsc{Hedge}")
-plt.plot(time, popf_fairness_index, label=r"$\alpha$\textsc{-FairCB}")
-plt.plot(time, fairCB_fairness_index, label=r"\textsc{FairCB}")
+for i in range(len(policies)):
+    plt.plot(time, fairness_index[i], label=labels[i])
 plt.legend(loc="lower right", fontsize="large")
 plt.xlabel("Time", fontsize="large")
 plt.ylabel("Jain's Fairness Index", fontsize="large")
-plt.title(r"\textsc{Figure 1}")
-plt.text(0.5, 0.95, f"$\\alpha={ALPHA}$, $\\nu = 0.9/N$, $\\delta={SMALL_REWARD}$", horizontalalignment='center', verticalalignment='center', transform=ax.transAxes)
+# if USETEXLIVE:
+#     plt.text(0.5, 0.95, f"$\\alpha={ALPHA}$, $\\nu = {config_dict['FAIRCBFAIRNESS']}$, $\\delta={SMALL_REWARD}$", horizontalalignment='center', verticalalignment='center', transform=ax.transAxes)
 # plt.title("Jain's Fairness Index Plot (Full Information Setting)", fontsize="large")
 plt.savefig(JAINS_FAIRNESS_PLOT_PATH, bbox_inches='tight', pad_inches=0.01)
 
 ## plotting standard regrets
 plt.figure(3)
-plt.plot(time, hedge_standard_regret, label=r"\textsc{Hedge}")
-plt.plot(time, popf_standard_regret, label=r"$\alpha$\textsc{-FairCB}")
-plt.plot(time, fairCB_standard_regret, label=r"\textsc{FairCB}")
+ax = plt.axes()
+for i in range(len(policies)):
+    plt.plot(time, standard_regrets[i], label=labels[i])
 plt.legend(loc="upper left", fontsize="large")
 plt.xlabel("Time", fontsize="large")
 plt.ylabel("Standard Regret", fontsize="large")
+# if USETEXLIVE:
+#     plt.text(0.5, 0.95, f"$\\alpha={ALPHA}$, $\\nu = {config_dict['FAIRCBFAIRNESS']}$, $\\delta={SMALL_REWARD}$", horizontalalignment='center', verticalalignment='center', transform=ax.transAxes)
 # plt.title("Standard Regret Plot (Full Information Setting)", fontsize="large")
 plt.savefig(STANDARD_REGRET_PLOT_PATH, bbox_inches='tight', pad_inches=0.01)
 
 ## plotting approximate regrets
 plt.figure(4)
 ax = plt.axes()
-plt.plot(time, hedge_approximate_regret, label=r"\textsc{Hedge}")
-plt.plot(time, popf_approximate_regret, label=r"$\alpha$\textsc{-FairCB}")
-plt.plot(time, fairCB_approximate_regret, label=r"\textsc{FairCB}")
+for i in range(len(policies)):
+    plt.plot(time, approximate_regrets[i], label=labels[i])
 plt.legend(loc="upper left", fontsize="large")
 plt.xlabel("Time", fontsize="large")
 plt.ylabel("Approximate Regret", fontsize="large")
-plt.title(r"\textsc{Figure 2}")
-plt.text(0.7, 0.5, f"$\\alpha={ALPHA}$, $\\nu = 0.9/N$, $\\delta={SMALL_REWARD}$", horizontalalignment='center', verticalalignment='center', transform=ax.transAxes)
+# if USETEXLIVE:
+#     plt.text(0.5, 0.95, f"$\\alpha={ALPHA}$, $\\nu = {config_dict['FAIRCBFAIRNESS']}$, $\\delta={SMALL_REWARD}$", horizontalalignment='center', verticalalignment='center', transform=ax.transAxes)
 # plt.title("Approximate Regret Plot (Full Information Setting)", fontsize="large")
 plt.savefig(APPROXIMATE_REGRET_PLOT_PATH, bbox_inches='tight', pad_inches=0.01)
