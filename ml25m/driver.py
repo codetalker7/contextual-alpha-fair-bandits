@@ -47,6 +47,9 @@ if (config_dict["USETIMESTAMPS"] == 'True'):
 else:
     USETIMESTAMPS = False
 
+## offline optimal filename
+OFFLINE_OPTIMAL_FILE = f"pickled_files/offline_optimal_alpha={ALPHA}_smallreward={SMALL_REWARD}_usetimestamps={USETIMESTAMPS}.pickle"
+
 ## random seed for numpy
 np.random.seed(SEED)
 
