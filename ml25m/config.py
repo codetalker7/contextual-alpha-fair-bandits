@@ -11,6 +11,7 @@ parser.add_argument('--FREQUENCY', dest='FREQUENCY', default=5000, help='Minimum
 parser.add_argument('--FAIRCBFAIRNESS', dest='FAIRCBFAIRNESS', default=0.5, help='Fairness parameter to be used for the FairCB algorithm.')
 parser.add_argument('--USETEXLIVE', dest='USETEXLIVE', action='store_true', help='Whether to use TexLive during plot generation.')
 parser.add_argument('--HIGHFREQUENCY', dest='HIGHFREQUENCY', action='store_true', help='Whether to use only those users whose frequency is larger than FREQUENCY.')
+parser.add_argument('--PLOTREGRET', dest='PLOTREGRET', action='store_true', help='True if standard/approximate regret needs to be plotted. False otherswise. This saves time if offline optimal values dont have to be computed.')
 
 args = parser.parse_args()
 config_dict = {
@@ -23,6 +24,7 @@ config_dict = {
     "FAIRCBFAIRNESS": float(args.FAIRCBFAIRNESS),
     "USETEXLIVE": args.USETEXLIVE,
     "HIGHFREQUENCY": args.HIGHFREQUENCY,
+    "PLOTREGRET": args.PLOTREGRET,
     "DATAPATH": "pickled_files/data.pickle",
     "CATEGORIES_PATH": "pickled_files/categories.pickle",
     "USER_TO_INDEX_PATH": "pickled_files/user_to_index.pickle",
