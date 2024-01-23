@@ -42,10 +42,7 @@ SEED = int(config_dict["SEED"])
 ALPHA = float(config_dict["ALPHA"])
 SMALL_REWARD = float(config_dict["SMALLREWARD"])
 APPROX_FACTOR = (1 - ALPHA) ** (-(1 - ALPHA)) 
-if (config_dict["USETIMESTAMPS"]): 
-    USETIMESTAMPS = True
-else:
-    USETIMESTAMPS = False
+USETIMESTAMPS = config_dict["USETIMESTAMPS"]
 
 ## offline optimal filename
 OFFLINE_OPTIMAL_FILE = f"pickled_files/offline_optimal_alpha={ALPHA}_smallreward={SMALL_REWARD}_usetimestamps={USETIMESTAMPS}.pickle"
