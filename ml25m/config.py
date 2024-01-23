@@ -10,6 +10,7 @@ parser.add_argument('--USETIMESTAMPS', dest='USETIMESTAMPS', action='store_true'
 parser.add_argument('--FREQUENCY', dest='FREQUENCY', default=5000, help='Minimum frequency of a context in the resultant dataset.')
 parser.add_argument('--FAIRCBFAIRNESS', dest='FAIRCBFAIRNESS', default=0.5, help='Fairness parameter to be used for the FairCB algorithm.')
 parser.add_argument('--USETEXLIVE', dest='USETEXLIVE', action='store_true', help='Whether to use TexLive during plot generation.')
+parser.add_argument('--HIGHFREQUENCY', dest='HIGHFREQUENCY', action='store_true', help='Whether to use only those users whose frequency is larger than FREQUENCY.')
 
 args = parser.parse_args()
 config_dict = {
@@ -21,6 +22,7 @@ config_dict = {
     "FREQUENCY": int(args.FREQUENCY),
     "FAIRCBFAIRNESS": float(args.FAIRCBFAIRNESS),
     "USETEXLIVE": args.USETEXLIVE,
+    "HIGHFREQUENCY": args.HIGHFREQUENCY,
     "DATAPATH": "pickled_files/data.pickle",
     "CATEGORIES_PATH": "pickled_files/categories.pickle",
     "USER_TO_INDEX_PATH": "pickled_files/user_to_index.pickle",
