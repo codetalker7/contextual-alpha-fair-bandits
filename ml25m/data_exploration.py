@@ -1,6 +1,8 @@
 import pandas as pd
 import pickle
-import json 
+import json
+
+from ml25m.data_exploration_new import FREQUENCY 
 
 data = pd.read_csv("data/ml-25m/ratings.csv")
 movies = pd.read_csv("data/ml-25m/movies.csv")
@@ -11,18 +13,18 @@ with open('config.json', 'r') as f:
 
 ROWS = int(config_dict["ROWS"])
 SEED = int(config_dict["SEED"])
-if (config_dict["USETIMESTAMPS"] == 'True'):
-    USETIMESTAMPS = True
+FREQUENCY = int(config_dict["FREQUENCY"])
+USETIMESTAMPS = config_dict["USETIMESTAMPS"]
+HIGHFREQUENCY = config_dict["HIGHFREQUENCY"]
+
+if not(HIGHFREQUENCY):
+    ## work with the first ROWS rows
+    data = data.iloc[:ROWS]
 else:
-    USETIMESTAMPS = False
-
-print("Number of rows to use: ", ROWS)
-print("Use timestamps to shuffle rows?: ", USETIMESTAMPS)
-print("Random seed to shuffle dataset (if USETIMESTAMPS is false): ", SEED)
-
-## work with the first ROWS rows
-data = data.iloc[:ROWS]
-data["movieId"].unique()
+    # high frequency users
+    high_frequency_users_dict = dict(filter(lambda x: x[1] >= FREQUENCY, dict(data['userId'].value_counts()).items()))
+    high_frequency_users = list(high_frequency_users_dict.keys())
+    data = data[data['userId'].isin(high_frequency_users)]
 
 ## remove rows where there are no genres listed
 def filter_movies(movieId):
@@ -54,8 +56,6 @@ stats_dict = {
     "NUM_CONTEXTS": len(data["userId"].unique()),
     "NUM_ARMS": len(list(categories)),
 }
-print("Number of contexts: ", stats_dict["NUM_CONTEXTS"])
-print("Number of arms:", stats_dict["NUM_ARMS"])
 
 with open('stats.json', 'w') as f:
     json.dump(stats_dict, f)
