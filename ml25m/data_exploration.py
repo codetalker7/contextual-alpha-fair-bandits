@@ -2,8 +2,6 @@ import pandas as pd
 import pickle
 import json
 
-from ml25m.data_exploration_new import FREQUENCY 
-
 data = pd.read_csv("data/ml-25m/ratings.csv")
 movies = pd.read_csv("data/ml-25m/movies.csv")
 movies = movies.set_index("movieId")
