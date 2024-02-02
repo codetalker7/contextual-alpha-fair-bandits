@@ -1,5 +1,7 @@
 from driver import *
 
+PLOTREGRET = config_dict["PLOTREGRET"]
+
 ## getting the offline optimal objectives
 with open(OFFLINE_OPTIMAL_FILE, "rb") as f:
     offline_optimal_values = pickle.load(f)
@@ -34,11 +36,12 @@ fairness_index = [[] for i in range(len(policies))]
 ## sum of rewards
 sum_rewards = [[0] for i in range(len(policies))]
 
-## standard regrets
-standard_regrets = [[] for i in range(len(policies))]
+if PLOTREGRET:
+    ## standard regrets
+    standard_regrets = [[] for i in range(len(policies))]
 
-## approximate regrets
-approximate_regrets = [[] for i in range(len(policies))]
+    ## approximate regrets
+    approximate_regrets = [[] for i in range(len(policies))]
 
 for t in tqdm(range(len(data))):
     data_point = data.iloc[t]
@@ -73,14 +76,15 @@ for t in tqdm(range(len(data))):
         last_cum_rewards = cumulative_rewards[i][-1]
         fairness_index[i].append(jains_fairness_index(last_cum_rewards))
 
-    ## update the standard regrets
-    for i in range(len(policies)):
-        last_cum_rewards = cumulative_rewards[i][-1]
-        standard_regrets[i].append(offline_optimal_values[t] - (last_cum_rewards ** (1 - ALPHA) / (1 - ALPHA)).sum())
-    ## update the approximate regret
-    for i in range(len(policies)):
-        last_cum_rewards = cumulative_rewards[i][-1]
-        approximate_regrets[i].append(offline_optimal_values[t] - APPROX_FACTOR * (last_cum_rewards ** (1 - ALPHA) / (1 - ALPHA)).sum())
+    if PLOTREGRET:
+        ## update the standard regrets
+        for i in range(len(policies)):
+            last_cum_rewards = cumulative_rewards[i][-1]
+            standard_regrets[i].append(offline_optimal_values[t] - (last_cum_rewards ** (1 - ALPHA) / (1 - ALPHA)).sum())
+        ## update the approximate regret
+        for i in range(len(policies)):
+            last_cum_rewards = cumulative_rewards[i][-1]
+            approximate_regrets[i].append(offline_optimal_values[t] - APPROX_FACTOR * (last_cum_rewards ** (1 - ALPHA) / (1 - ALPHA)).sum())
 
     ## feedback rewards to the policies
     for i in range(len(policies)):
@@ -151,27 +155,28 @@ plt.ylabel("Jain's Fairness Index", fontsize="large")
 plt.savefig(JAINS_FAIRNESS_PLOT_PATH, bbox_inches='tight', pad_inches=0.01)
 
 ## plotting standard regrets
-plt.figure(3)
-ax = plt.axes()
-for i in range(len(policies)):
-    plt.plot(time, standard_regrets[i], label=labels[i])
-plt.legend(loc="upper left", fontsize="large")
-plt.xlabel("Time", fontsize="large")
-plt.ylabel("Standard Regret", fontsize="large")
-# if USETEXLIVE:
-#     plt.text(0.5, 0.95, f"$\\alpha={ALPHA}$, $\\nu = {config_dict['FAIRCBFAIRNESS']}$, $\\delta={SMALL_REWARD}$", horizontalalignment='center', verticalalignment='center', transform=ax.transAxes)
-# plt.title("Standard Regret Plot (Full Information Setting)", fontsize="large")
-plt.savefig(STANDARD_REGRET_PLOT_PATH, bbox_inches='tight', pad_inches=0.01)
+if PLOTREGRET:
+    plt.figure(3)
+    ax = plt.axes()
+    for i in range(len(policies)):
+        plt.plot(time, standard_regrets[i], label=labels[i])
+    plt.legend(loc="upper left", fontsize="large")
+    plt.xlabel("Time", fontsize="large")
+    plt.ylabel("Standard Regret", fontsize="large")
+    # if USETEXLIVE:
+    #     plt.text(0.5, 0.95, f"$\\alpha={ALPHA}$, $\\nu = {config_dict['FAIRCBFAIRNESS']}$, $\\delta={SMALL_REWARD}$", horizontalalignment='center', verticalalignment='center', transform=ax.transAxes)
+    # plt.title("Standard Regret Plot (Full Information Setting)", fontsize="large")
+    plt.savefig(STANDARD_REGRET_PLOT_PATH, bbox_inches='tight', pad_inches=0.01)
 
-## plotting approximate regrets
-plt.figure(4)
-ax = plt.axes()
-for i in range(len(policies)):
-    plt.plot(time, approximate_regrets[i], label=labels[i])
-plt.legend(loc="upper left", fontsize="large")
-plt.xlabel("Time", fontsize="large")
-plt.ylabel("Approximate Regret", fontsize="large")
-# if USETEXLIVE:
-#     plt.text(0.5, 0.95, f"$\\alpha={ALPHA}$, $\\nu = {config_dict['FAIRCBFAIRNESS']}$, $\\delta={SMALL_REWARD}$", horizontalalignment='center', verticalalignment='center', transform=ax.transAxes)
-# plt.title("Approximate Regret Plot (Full Information Setting)", fontsize="large")
-plt.savefig(APPROXIMATE_REGRET_PLOT_PATH, bbox_inches='tight', pad_inches=0.01)
+    ## plotting approximate regrets
+    plt.figure(4)
+    ax = plt.axes()
+    for i in range(len(policies)):
+        plt.plot(time, approximate_regrets[i], label=labels[i])
+    plt.legend(loc="upper left", fontsize="large")
+    plt.xlabel("Time", fontsize="large")
+    plt.ylabel("Approximate Regret", fontsize="large")
+    # if USETEXLIVE:
+    #     plt.text(0.5, 0.95, f"$\\alpha={ALPHA}$, $\\nu = {config_dict['FAIRCBFAIRNESS']}$, $\\delta={SMALL_REWARD}$", horizontalalignment='center', verticalalignment='center', transform=ax.transAxes)
+    # plt.title("Approximate Regret Plot (Full Information Setting)", fontsize="large")
+    plt.savefig(APPROXIMATE_REGRET_PLOT_PATH, bbox_inches='tight', pad_inches=0.01)
