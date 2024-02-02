@@ -3,8 +3,9 @@ from driver import *
 PLOTREGRET = config_dict["PLOTREGRET"]
 
 ## getting the offline optimal objectives
-with open(OFFLINE_OPTIMAL_FILE, "rb") as f:
-    offline_optimal_values = pickle.load(f)
+if PLOTREGRET:
+    with open(OFFLINE_OPTIMAL_FILE, "rb") as f:
+        offline_optimal_values = pickle.load(f)
 
 ## running the policies
 from Hedge import Hedge
