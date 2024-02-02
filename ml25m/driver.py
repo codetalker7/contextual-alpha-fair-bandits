@@ -45,7 +45,7 @@ APPROX_FACTOR = (1 - ALPHA) ** (-(1 - ALPHA))
 USETIMESTAMPS = config_dict["USETIMESTAMPS"]
 
 ## offline optimal filename
-OFFLINE_OPTIMAL_FILE = f"pickled_files/offline_optimal_alpha={ALPHA}_smallreward={SMALL_REWARD}_usetimestamps={USETIMESTAMPS}.pickle"
+OFFLINE_OPTIMAL_FILE = f'pickled_files/offline_optimal_rows={config_dict["ROWS"]}_seed={SEED}_alpha={ALPHA}_smallreward={SMALL_REWARD}_usetimestamps={USETIMESTAMPS}_frequency={config_dict["FREQUENCY"]}_highfrequency={config_dict["HIGHFREQUENCY"]}.pickle'
 
 ## random seed for numpy
 np.random.seed(SEED)
