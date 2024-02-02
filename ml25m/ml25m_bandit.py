@@ -1,98 +1,100 @@
 from driver import *
 
-## map userId's to an index in the range [0, NUM_CONTEXTS - 1]
-user_ids = sorted(list(data["userId"].unique()))
-map_user_to_index = dict()
-index = 0
-for user_id in user_ids:
-    map_user_to_index[user_id] = index
-    index += 1
+PLOTREGRET = config_dict["PLOTREGRET"]
 
+## getting the offline optimal objectives
+if PLOTREGRET:
+    with open(OFFLINE_OPTIMAL_FILE, "rb") as f:
+        offline_optimal_values = pickle.load(f)
+
+## running the policies
 from ScaleFreeMAB import ScaleFreeMAB
 from ParallelScaleFreeMAB import ParallelScaleFreeMAB
 from utils import jains_fairness_index
 
-scaleFreePolicy = ScaleFreeMAB(NUM_CONTEXTS, NUM_ARMS)
-parallelScaleFreePolicy = ParallelScaleFreeMAB(NUM_CONTEXTS, NUM_ARMS, ALPHA)
+policies = [
+    ScaleFreeMAB(NUM_CONTEXTS, NUM_ARMS),
+    ParallelScaleFreeMAB(NUM_CONTEXTS, NUM_ARMS, ALPHA)
+]
 
 ## keeping track of cumulative rewards
-scaleFree_cum_rewards = [np.ones((NUM_ARMS, ))]
-parallelScaleFree_cum_rewards = [np.ones((NUM_ARMS, ))]
+cumulative_rewards = [[np.ones(NUM_ARMS, )] for i in range(len(policies))]
 
 ## alpha-performance
-scaleFree_alpha_performance = []
-parallelScaleFree_alpha_performance = []
+alpha_performance = [[] for i in range(len(policies))]
 
 ## jain's fairness index
-scaleFree_fairness_index = []
-parallelScaleFree_fairness_index = []
+fairness_index = [[] for i in range(len(policies))]
 
 ## sum of rewards
-scaleFree_sum_rewards = [0]
-parallelScaleFree_sum_rewards = [0]
+sum_rewards = [[0] for i in range(len(policies))]
 
-## standard regrets
-scaleFree_standard_regret = []
-parallelScaleFree_standard_regret = []
+if PLOTREGRET:
+    ## standard regrets
+    standard_regrets = [[] for i in range(len(policies))]
 
-## approximate regrets
-scaleFree_approximate_regret = []
-parallelScaleFree_approximate_regret = []
+    ## approximate regrets
+    approximate_regrets = [[] for i in range(len(policies))]
 
 for t in tqdm(range(len(data))):
     data_point = data.iloc[t]
     userId = int(data_point["userId"])
     movieId = int(data_point["movieId"])
 
-    scaleFree_recommended_genre = scaleFreePolicy.decision(userId - 1)      # context labels start from 0
-    parallelScaleFree_recommended_genre = parallelScaleFreePolicy.decision(userId - 1)
+    recommended_genres = [policies[i].decision(map_user_to_index[userId]) for i in range(len(policies))]
 
     ## characteristic vector for chosen arm
-    scaleFree_char_vector = np.zeros((NUM_ARMS, ))
-    scaleFree_char_vector[scaleFree_recommended_genre - 1] = 1
-
-    parallelScaleFree_char_vector = np.zeros((NUM_ARMS, ))
-    parallelScaleFree_char_vector[parallelScaleFree_recommended_genre - 1] = 1
+    char_vectors = [np.zeros(NUM_ARMS, ) for i in range(len(policies))]
+    for i in range(len(policies)):
+        char_vectors[i][recommended_genres[i] - 1] = 1
 
     ## get rewards corresponding to the movie
     rewards = get_rewards(movieId)
 
     ## update performance
-    scaleFree_sum_rewards.append(scaleFree_sum_rewards[-1] + rewards[scaleFree_recommended_genre - 1])
-    parallelScaleFree_sum_rewards.append(parallelScaleFree_sum_rewards[-1] + rewards[parallelScaleFree_recommended_genre - 1])
-
+    for i in range(len(policies)):
+        sum_rewards[i].append(sum_rewards[i][-1] + rewards[recommended_genres[i] - 1])
+    
     ## update cum rewards
-    scaleFree_last_cum_rewards = scaleFree_cum_rewards[-1]
-    parallelScaleFree_last_cum_rewards = parallelScaleFree_cum_rewards[-1]
-
-    scaleFree_cum_rewards.append(scaleFree_last_cum_rewards + rewards * scaleFree_char_vector)
-    parallelScaleFree_cum_rewards.append(parallelScaleFree_last_cum_rewards + rewards * parallelScaleFree_char_vector)
+    for i in range(len(policies)):
+        last_cum_rewards = cumulative_rewards[i][-1]
+        cumulative_rewards[i].append(last_cum_rewards + rewards * char_vectors[i])
 
     ## updating alpha-performance
-    scaleFree_alpha_performance.append((scaleFree_cum_rewards[-1] ** (1 - ALPHA) / (1 - ALPHA)).sum()) 
-    parallelScaleFree_alpha_performance.append((parallelScaleFree_cum_rewards[-1] ** (1 - ALPHA) / (1 - ALPHA)).sum())
-
+    for i in range(len(policies)):
+        last_cum_rewards = cumulative_rewards[i][-1]
+        alpha_performance[i].append((last_cum_rewards ** (1 - ALPHA) / (1 - ALPHA)).sum())
+    
     ## update the fairness index
-    scaleFree_fairness_index.append(jains_fairness_index(scaleFree_cum_rewards[-1]))
-    parallelScaleFree_fairness_index.append(jains_fairness_index(parallelScaleFree_cum_rewards[-1]))
+    for i in range(len(policies)):
+        last_cum_rewards = cumulative_rewards[i][-1]
+        fairness_index[i].append(jains_fairness_index(last_cum_rewards))
 
-    ## update the standard regrets
-    scaleFree_standard_regret.append(offline_optimal_values[t] - ((scaleFree_cum_rewards[-1] ** (1 - ALPHA)) / (1 - ALPHA)).sum())
-    parallelScaleFree_standard_regret.append(offline_optimal_values[t] - ((parallelScaleFree_cum_rewards[-1] ** (1 - ALPHA)) / (1 - ALPHA)).sum())
-
-    ## update the approximate regrets
-    scaleFree_approximate_regret.append(offline_optimal_values[t] - APPROX_FACTOR * ((scaleFree_cum_rewards[-1] ** (1 - ALPHA)) / (1 - ALPHA)).sum())
-    parallelScaleFree_approximate_regret.append(offline_optimal_values[t] - APPROX_FACTOR * ((parallelScaleFree_cum_rewards[-1] ** (1 - ALPHA)) / (1 - ALPHA)).sum())
+    if PLOTREGRET:
+        ## update the standard regrets
+        for i in range(len(policies)):
+            last_cum_rewards = cumulative_rewards[i][-1]
+            standard_regrets[i].append(offline_optimal_values[t] - (last_cum_rewards ** (1 - ALPHA) / (1 - ALPHA)).sum())
+        ## update the approximate regret
+        for i in range(len(policies)):
+            last_cum_rewards = cumulative_rewards[i][-1]
+            approximate_regrets[i].append(offline_optimal_values[t] - APPROX_FACTOR * (last_cum_rewards ** (1 - ALPHA) / (1 - ALPHA)).sum())
 
     ## feedback rewards to the policies
-    scaleFreePolicy.feedback(rewards[scaleFree_recommended_genre - 1])
-    parallelScaleFreePolicy.feedback(rewards[parallelScaleFree_recommended_genre - 1])
+    for i in range(len(policies)):
+        policies[i].feedback(rewards[recommended_genres[i] - 1])
 
 ## plotting
 # %matplotlib inline
 import matplotlib.pyplot as plt
-plt.rc('text', usetex=True)
-plt.rc('text.latex', preamble=r'\usepackage{amsmath}')
+USETEXLIVE = config_dict["USETEXLIVE"]
+
+if USETEXLIVE:
+    plt.rc('text', usetex=True)
+    plt.rc('text.latex', preamble=r'\usepackage{amsmath}')
+    labels = [r"\text{Putta and Aggarwal 2022}", r"$\alpha$\textsc{-FairCB}"]
+else:
+    labels = ["Putta and Aggarwal 2022", "alpha-FairCB"]
 plt.style.use('seaborn-v0_8-darkgrid')
 plt.rcParams["figure.figsize"] = (5, 4)
 
@@ -105,49 +107,72 @@ APPROXIMATE_REGRET_PLOT_PATH = "plots/approximate_regret_bandit_information.pdf"
 time = np.arange(1, len(data) + 1)
 
 ## plotting performance
-scaleFree_performance = np.array(scaleFree_sum_rewards)[1:] * (1 / time)
-parallelScaleFree_performance = np.array(parallelScaleFree_sum_rewards)[1:] * (1 / time)
+performance = [np.array(sum_rewards[i][1:]) * (1 / time) for i in range(len(policies))]
+# scaleFree_performance = np.array(scaleFree_sum_rewards)[1:] * (1 / time)
+# parallelScaleFree_performance = np.array(parallelScaleFree_sum_rewards)[1:] * (1 / time)
 
 plt.figure(0)
-plt.plot(time, scaleFree_performance, label="Putta \& Aggarwal, 2022")
-plt.plot(time, parallelScaleFree_performance, label=r"$\alpha\textsc{-FairCB}$")
-plt.legend(loc="upper left", fontsize="large")
-plt.xlabel("Time", fontsize="large")
-plt.ylabel("Performance", fontsize="large")
-plt.savefig(PERFORMANCE_PLOT_PATH)
+ax = plt.axes()
+for i in range(len(policies)):
+    plt.plot(time, performance[i], label=labels[i])
+plt.xlabel("Time")
+plt.ylabel("Performance")
+# if USETEXLIVE:
+#     plt.text(0.5, 0.95, f"$\\alpha={ALPHA}$, $\\nu = {config_dict['FAIRCBFAIRNESS']}$, $\\delta={SMALL_REWARD}$", horizontalalignment='center', verticalalignment='center', transform=ax.transAxes)
+# plt.title("Performance Plot")
+plt.savefig(PERFORMANCE_PLOT_PATH, bbox_inches='tight', pad_inches=0.01)
 
 ## plotting alpha-performance
 plt.figure(1)
-plt.plot(time, scaleFree_alpha_performance, label="Putta \& Aggarwal, 2022")
-plt.plot(time, parallelScaleFree_alpha_performance, label=r"$\alpha\textsc{-FairCB}$")
+ax = plt.axes()
+for i in range(len(policies)):
+    plt.plot(time, alpha_performance[i], label=labels[i])
 plt.legend(loc="upper left", fontsize="large")
 plt.xlabel("Time", fontsize="large")
-plt.ylabel(r'$\alpha$-Performance', fontsize="large")
+if USETEXLIVE:
+    # plt.text(0.5, 0.95, f"$\\alpha={ALPHA}$, $\\nu = {config_dict['FAIRCBFAIRNESS']}$, $\\delta={SMALL_REWARD}$", horizontalalignment='center', verticalalignment='center', transform=ax.transAxes)
+    plt.ylabel(r"$\alpha$-Performance", fontsize="large")
+else:
+    plt.ylabel("alpha-Performance", fontsize="large")
+# plt.title("Alpha-Performance Plot (Full Information Setting)", fontsize="large")
 plt.savefig(ALPHA_PERFORMANCE_PLOT_PATH, bbox_inches='tight', pad_inches=0.01)
 
 ## plotting fairness
 plt.figure(2)
-plt.plot(time, scaleFree_fairness_index, label="Putta \& Aggarwal, 2022")
-plt.plot(time, parallelScaleFree_fairness_index, label=r"$\alpha\textsc{-FairCB}$")
-plt.legend(loc="lower left", fontsize="large")
+ax = plt.axes()
+for i in range(len(policies)):
+    plt.plot(time, fairness_index[i], label=labels[i])
+plt.legend(loc="lower right", fontsize="large")
 plt.xlabel("Time", fontsize="large")
 plt.ylabel("Jain's Fairness Index", fontsize="large")
+# if USETEXLIVE:
+#     plt.text(0.5, 0.95, f"$\\alpha={ALPHA}$, $\\nu = {config_dict['FAIRCBFAIRNESS']}$, $\\delta={SMALL_REWARD}$", horizontalalignment='center', verticalalignment='center', transform=ax.transAxes)
+# plt.title("Jain's Fairness Index Plot (Full Information Setting)", fontsize="large")
 plt.savefig(JAINS_FAIRNESS_PLOT_PATH, bbox_inches='tight', pad_inches=0.01)
 
 ## plotting standard regrets
-plt.figure(3)
-plt.plot(time, scaleFree_standard_regret, label="Putta \& Aggarwal, 2022")
-plt.plot(time, parallelScaleFree_standard_regret, label=r"$\alpha\textsc{-FairCB}$")
-plt.legend(loc="center right", fontsize="large")
-plt.xlabel("Time", fontsize="large")
-plt.ylabel("Standard Regret", fontsize="large")
-plt.savefig(STANDARD_REGRET_PLOT_PATH, bbox_inches='tight', pad_inches=0.01)
+if PLOTREGRET:
+    plt.figure(3)
+    ax = plt.axes()
+    for i in range(len(policies)):
+        plt.plot(time, standard_regrets[i], label=labels[i])
+    plt.legend(loc="upper left", fontsize="large")
+    plt.xlabel("Time", fontsize="large")
+    plt.ylabel("Standard Regret", fontsize="large")
+    # if USETEXLIVE:
+    #     plt.text(0.5, 0.95, f"$\\alpha={ALPHA}$, $\\nu = {config_dict['FAIRCBFAIRNESS']}$, $\\delta={SMALL_REWARD}$", horizontalalignment='center', verticalalignment='center', transform=ax.transAxes)
+    # plt.title("Standard Regret Plot (Full Information Setting)", fontsize="large")
+    plt.savefig(STANDARD_REGRET_PLOT_PATH, bbox_inches='tight', pad_inches=0.01)
 
-## plotting approximate regrets
-plt.figure(4)
-plt.plot(time, scaleFree_approximate_regret, label="Putta \& Aggarwal, 2022")
-plt.plot(time, parallelScaleFree_approximate_regret, label=r"$\alpha\textsc{-FairCB}$")
-plt.legend(loc="center right", fontsize="large")
-plt.xlabel("Time", fontsize="large")
-plt.ylabel("Approximate Regret", fontsize="large")
-plt.savefig(APPROXIMATE_REGRET_PLOT_PATH, bbox_inches='tight', pad_inches=0.01)
+    ## plotting approximate regrets
+    plt.figure(4)
+    ax = plt.axes()
+    for i in range(len(policies)):
+        plt.plot(time, approximate_regrets[i], label=labels[i])
+    plt.legend(loc="upper left", fontsize="large")
+    plt.xlabel("Time", fontsize="large")
+    plt.ylabel("Approximate Regret", fontsize="large")
+    # if USETEXLIVE:
+    #     plt.text(0.5, 0.95, f"$\\alpha={ALPHA}$, $\\nu = {config_dict['FAIRCBFAIRNESS']}$, $\\delta={SMALL_REWARD}$", horizontalalignment='center', verticalalignment='center', transform=ax.transAxes)
+    # plt.title("Approximate Regret Plot (Full Information Setting)", fontsize="large")
+    plt.savefig(APPROXIMATE_REGRET_PLOT_PATH, bbox_inches='tight', pad_inches=0.01)
