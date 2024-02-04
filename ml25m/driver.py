@@ -61,7 +61,7 @@ OFFLINE_OPTIMAL_FILE = f'pickled_files/offline_optimal_rows={config_dict["ROWS"]
 np.random.seed(SEED)
 
 ## logging some stats
-print("ROWS (number of rows of the dataset): ", config_dict["ROWS"])
+print("ROWS (number of rows of the dataset): ", len(data))
 print("ARMS: ", NUM_ARMS)
 print("CONTEXTS: ", NUM_CONTEXTS)
 print("ALPHA: ", ALPHA)
