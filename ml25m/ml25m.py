@@ -1,23 +1,9 @@
-from driver import *
-
-PLOTREGRET = config_dict["PLOTREGRET"]
+from driver_full_information import *
 
 ## getting the offline optimal objectives
 if PLOTREGRET:
     with open(OFFLINE_OPTIMAL_FILE, "rb") as f:
         offline_optimal_values = pickle.load(f)
-
-## running the policies
-from Hedge import Hedge
-from ParallelOPF import ParallelOPF
-from FairCB import FairCB
-from utils import jains_fairness_index
-
-## getting the context distribution for fairCB
-valueCounts = data["userId"].value_counts()
-context_distribution = np.zeros((NUM_CONTEXTS, ))
-for context_id in range(NUM_CONTEXTS):
-    context_distribution[context_id] = valueCounts.loc[map_index_to_user[context_id]] / len(data)
 
 policies = [
     Hedge(NUM_CONTEXTS, NUM_ARMS, len(data)),
@@ -93,8 +79,6 @@ for t in tqdm(range(len(data))):
 
 ## plotting
 # %matplotlib inline
-import matplotlib.pyplot as plt
-USETEXLIVE = config_dict["USETEXLIVE"]
 
 if USETEXLIVE:
     plt.rc('text', usetex=True)
@@ -104,12 +88,6 @@ else:
     labels = ["Hedge", "alpha-FairCB", "FairCB"]
 plt.style.use('seaborn-v0_8-darkgrid')
 plt.rcParams["figure.figsize"] = (5, 4)
-
-PERFORMANCE_PLOT_PATH = "plots/performance_full_information.pdf"
-ALPHA_PERFORMANCE_PLOT_PATH = "plots/alpha_performance_full_information.pdf"
-JAINS_FAIRNESS_PLOT_PATH = "plots/jains_index_full_information.pdf"
-APPROXIMATE_REGRET_PLOT_PATH = "plots/approximate_regret_full_information.pdf"
-STANDARD_REGRET_PLOT_PATH = "plots/standard_regret_full_information.pdf"
 
 time = np.arange(1, len(data) + 1)
 
