@@ -12,6 +12,7 @@ with open('config.json', 'r') as f:
 ROWS = int(config_dict["ROWS"])
 SEED = int(config_dict["SEED"])
 FREQUENCY = int(config_dict["FREQUENCY"])
+FREQUENCY_MAX = int(config_dict["FREQUENCY_MAX"])
 USETIMESTAMPS = config_dict["USETIMESTAMPS"]
 HIGHFREQUENCY = config_dict["HIGHFREQUENCY"]
 
@@ -20,7 +21,7 @@ if not(HIGHFREQUENCY):
     data = data.iloc[:ROWS]
 else:
     # high frequency users
-    high_frequency_users_dict = dict(filter(lambda x: x[1] >= FREQUENCY, dict(data['userId'].value_counts()).items()))
+    high_frequency_users_dict = dict(filter(lambda x: x[1] >= FREQUENCY and x[1] <= FREQUENCY_MAX, dict(data['userId'].value_counts()).items()))
     high_frequency_users = list(high_frequency_users_dict.keys())
     data = data[data['userId'].isin(high_frequency_users)]
 
