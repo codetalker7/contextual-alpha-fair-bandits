@@ -54,6 +54,8 @@ for rounds in range(VARYING_NU_ROUNDS):
         fairness_values = [max(fairness_index[i][len(data) - 1], fairness_values[i]) for i in range(len(policies) - 1)]
         alphaFairCBValue = max(alphaFairCBValue, fairness_index[len(policies) - 1][len(data) - 1])
 
+    print(f"Round {round + 1} completed")
+
 with open(FAIRNESS_VALUES_FILE, 'wb') as f:
     pickle.dump({
         "fairness_values": fairness_values,
