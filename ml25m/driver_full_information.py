@@ -7,10 +7,11 @@ from utils import jains_fairness_index
 
 import matplotlib.pyplot as plt
 
-FOLDER_PREFIX = f''
-
 ## for varying nu experiments
 FAIRNESS_VALUES_FILE = f'pickled_files/fairness_values_rows={config_dict["ROWS"]}_seed={SEED}_alpha={ALPHA}_smallreward={SMALL_REWARD}_usetimestamps={USETIMESTAMPS}_frequency={config_dict["FREQUENCY"]}_frequencymax={config_dict["FREQUENCY_MAX"]}_highfrequency={config_dict["HIGHFREQUENCY"]}_numnus={NUM_NUS}.pickle'
+
+## for varying alpha experiments
+CUMULATIVE_REWARDS_FILE = f'pickled_files/cumulative_rewards_rows={config_dict["ROWS"]}_seed={SEED}_alpha={ALPHA}_smallreward={SMALL_REWARD}_usetimestamps={USETIMESTAMPS}_frequency={config_dict["FREQUENCY"]}_frequencymax={config_dict["FREQUENCY_MAX"]}_highfrequency={config_dict["HIGHFREQUENCY"]}_numalphas={NUM_ALPHAS}.pickle'
 
 ## getting the context distribution for fairCB
 valueCounts = data["userId"].value_counts()
@@ -23,3 +24,5 @@ JAINS_FAIRNESS_PLOT_PATH = "plots/jains_index_full_information.pdf"
 APPROXIMATE_REGRET_PLOT_PATH = "plots/approximate_regret_full_information.pdf"
 STANDARD_REGRET_PLOT_PATH = "plots/standard_regret_full_information.pdf"
 VARYING_NUS_PLOT_PATH = "plots/jains_index_varying_nus.pdf"
+VARYING_ALPHAS_PLOT_PATH = "plots/jains_index_varying_alphas.pdf"
+AVERAGED_CUMULATIVE_REWARDS_PATH = "plots/avg_cumulative_rewards.pdf"
