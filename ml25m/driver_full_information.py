@@ -19,8 +19,6 @@ for context_id in range(NUM_CONTEXTS):
     context_distribution[context_id] = valueCounts.loc[map_index_to_user[context_id]] / len(data)
 
 ## plot paths
-PERFORMANCE_PLOT_PATH = "plots/performance_full_information.pdf"
-ALPHA_PERFORMANCE_PLOT_PATH = "plots/alpha_performance_full_information.pdf"
 JAINS_FAIRNESS_PLOT_PATH = "plots/jains_index_full_information.pdf"
 APPROXIMATE_REGRET_PLOT_PATH = "plots/approximate_regret_full_information.pdf"
 STANDARD_REGRET_PLOT_PATH = "plots/standard_regret_full_information.pdf"
