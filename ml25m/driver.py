@@ -42,7 +42,11 @@ SEED = int(config_dict["SEED"])
 ALPHA = float(config_dict["ALPHA"])
 SMALL_REWARD = float(config_dict["SMALLREWARD"])
 APPROX_FACTOR = (1 - ALPHA) ** (-(1 - ALPHA)) 
+NUM_NUS = int(config_dict["NUM_NUS"])
+NUM_ALPHAS = int(config_dict["NUM_ALPHAS"])
 USETIMESTAMPS = config_dict["USETIMESTAMPS"]
+USETEXLIVE = config_dict["USETEXLIVE"]
+PLOTREGRET = config_dict["PLOTREGRET"]
 
 ## offline optimal filename
 OFFLINE_OPTIMAL_FILE = f'pickled_files/offline_optimal_rows={config_dict["ROWS"]}_seed={SEED}_alpha={ALPHA}_smallreward={SMALL_REWARD}_usetimestamps={USETIMESTAMPS}_frequency={config_dict["FREQUENCY"]}_highfrequency={config_dict["HIGHFREQUENCY"]}.pickle'
@@ -51,6 +55,7 @@ OFFLINE_OPTIMAL_FILE = f'pickled_files/offline_optimal_rows={config_dict["ROWS"]
 np.random.seed(SEED)
 
 ## logging some stats
+print("ROWS (number of rows of the dataset): ", config_dict["ROWS"])
 print("ARMS: ", NUM_ARMS)
 print("CONTEXTS: ", NUM_CONTEXTS)
 print("ALPHA: ", ALPHA)
