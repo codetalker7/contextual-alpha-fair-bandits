@@ -45,6 +45,7 @@ FREQUENCY = int(config_dict["FREQUENCY"])
 FAIRCBFAIRNESS = float(config_dict["FAIRCBFAIRNESS"])
 NUM_NUS = int(config_dict["NUM_NUS"])
 NUM_ALPHAS = int(config_dict["NUM_ALPHAS"])
+VARYING_NU_ROUNDS = int(config_dict["VARYING_NU_ROUNDS"])
 USETIMESTAMPS = config_dict["USETIMESTAMPS"]
 USETEXLIVE = config_dict["USETEXLIVE"]
 HIGHFREQUENCY = config_dict["HIGHFREQUENCY"]

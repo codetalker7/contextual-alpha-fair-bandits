@@ -14,6 +14,7 @@ parser.add_argument('--HIGHFREQUENCY', dest='HIGHFREQUENCY', action='store_true'
 parser.add_argument('--PLOTREGRET', dest='PLOTREGRET', action='store_true', help='True if standard/approximate regret needs to be plotted. False otherswise. This saves time if offline optimal values dont have to be computed.')
 parser.add_argument('--NUMNUS', dest='NUM_NUS', default=50, help='Number of values of nu (the fairness parameter for FairCB) required for the experiments for varying values of nu.')
 parser.add_argument('--NUMALPHAS', dest='NUM_ALPHAS', default=50, help='Number of values of alpha (the fairness parameter for our policy) required for the experiments for varying values of alpha.')
+parser.add_argument('--VARYING_NU_ROUNDS', dest='VARYING_NU_ROUNDS', default=50, help='Number of rounds for the experiments for varying values of nu (the fairness parameter for the FairCB algorithm).')
 
 args = parser.parse_args()
 config_dict = {
@@ -26,6 +27,7 @@ config_dict = {
     "FAIRCBFAIRNESS": float(args.FAIRCBFAIRNESS),
     "NUM_NUS": int(args.NUM_NUS),
     "NUM_ALPHAS": int(args.NUM_ALPHAS),
+    "VARYING_NU_ROUNDS": int(args.VARYING_NU_ROUNDS),
     "USETEXLIVE": args.USETEXLIVE,
     "HIGHFREQUENCY": args.HIGHFREQUENCY,
     "PLOTREGRET": args.PLOTREGRET,
