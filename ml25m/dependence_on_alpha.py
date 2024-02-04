@@ -29,7 +29,7 @@ for t in tqdm(range(len(data))):
         policies[i].feedback(rewards)
 
 ## saving the cumulative rewards as pickle files
-with open("cumulative_rewards.pickle", 'wb') as f:
+with open(CUMULATIVE_REWARDS_FILE, 'wb') as f:
     pickle.dump({
         "cumulative_rewards": cumulative_rewards,
         "alphas": alphas,
