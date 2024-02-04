@@ -6,7 +6,7 @@ nus = np.linspace(0, 1, NUM_NUS + 1).tolist()[:-1]
 fairness_values = []
 alphaFairCBValue = None
 
-for rounds in range(VARYING_NU_ROUNDS):
+for rounds in tqdm(range(VARYING_NU_ROUNDS)):
     ## will have one FairCB policy for each nu
     policies = [
         FairCB(NUM_CONTEXTS, NUM_ARMS, nus[i] / NUM_ARMS, len(data), context_distribution)
@@ -53,8 +53,6 @@ for rounds in range(VARYING_NU_ROUNDS):
         # take the max
         fairness_values = [max(fairness_index[i][len(data) - 1], fairness_values[i]) for i in range(len(policies) - 1)]
         alphaFairCBValue = max(alphaFairCBValue, fairness_index[len(policies) - 1][len(data) - 1])
-
-    print(f"Round {round + 1} completed")
 
 with open(FAIRNESS_VALUES_FILE, 'wb') as f:
     pickle.dump({
