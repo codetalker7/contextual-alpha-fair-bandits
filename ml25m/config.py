@@ -8,6 +8,7 @@ parser.add_argument('--ALPHA', dest='ALPHA', default=0.5, help='Fairness level')
 parser.add_argument('--SMALLREWARD', dest='SMALL_REWARD', default=0.001, help='Very small reward for the bad arm.')
 parser.add_argument('--USETIMESTAMPS', dest='USETIMESTAMPS', action='store_true', help='Boolean determining whether the timestamps given in the dataset will be used to shuffle the rows.')
 parser.add_argument('--FREQUENCY', dest='FREQUENCY', default=5000, help='Minimum frequency of a context in the resultant dataset.')
+parser.add_argument('--FREQUENCY_MAX', dest='FREQUENCY_MAX', default=10000, help='Maximum frequency of a context in the resultant dataset.')
 parser.add_argument('--FAIRCBFAIRNESS', dest='FAIRCBFAIRNESS', default=0.5, help='Fairness parameter to be used for the FairCB algorithm.')
 parser.add_argument('--USETEXLIVE', dest='USETEXLIVE', action='store_true', help='Whether to use TexLive during plot generation.')
 parser.add_argument('--HIGHFREQUENCY', dest='HIGHFREQUENCY', action='store_true', help='Whether to use only those users whose frequency is larger than FREQUENCY.')
@@ -24,6 +25,7 @@ config_dict = {
     "SMALLREWARD": float(args.SMALL_REWARD),
     "USETIMESTAMPS": args.USETIMESTAMPS,
     "FREQUENCY": int(args.FREQUENCY),
+    "FREQUENCY_MAX": int(args.FREQUENCY_MAX),
     "FAIRCBFAIRNESS": float(args.FAIRCBFAIRNESS),
     "NUM_NUS": int(args.NUM_NUS),
     "NUM_ALPHAS": int(args.NUM_ALPHAS),

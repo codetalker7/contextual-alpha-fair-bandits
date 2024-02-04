@@ -42,6 +42,7 @@ ALPHA = float(config_dict["ALPHA"])
 SMALL_REWARD = float(config_dict["SMALLREWARD"])
 APPROX_FACTOR = (1 - ALPHA) ** (-(1 - ALPHA)) 
 FREQUENCY = int(config_dict["FREQUENCY"])
+FREQUENCY_MAX = int(config_dict["FREQUENCY_MAX"])
 FAIRCBFAIRNESS = float(config_dict["FAIRCBFAIRNESS"])
 NUM_NUS = int(config_dict["NUM_NUS"])
 NUM_ALPHAS = int(config_dict["NUM_ALPHAS"])
@@ -55,7 +56,7 @@ NUM_CONTEXTS = int(stats_dict["NUM_CONTEXTS"])
 NUM_ARMS = int(stats_dict["NUM_ARMS"])
 
 ## offline optimal filename
-OFFLINE_OPTIMAL_FILE = f'pickled_files/offline_optimal_rows={config_dict["ROWS"]}_seed={SEED}_alpha={ALPHA}_smallreward={SMALL_REWARD}_usetimestamps={USETIMESTAMPS}_frequency={config_dict["FREQUENCY"]}_highfrequency={config_dict["HIGHFREQUENCY"]}.pickle'
+OFFLINE_OPTIMAL_FILE = f'pickled_files/offline_optimal_rows={config_dict["ROWS"]}_seed={SEED}_alpha={ALPHA}_smallreward={SMALL_REWARD}_usetimestamps={USETIMESTAMPS}_frequency={config_dict["FREQUENCY"]}_frequencymax={config_dict["FREQUENCY_MAX"]}_highfrequency={config_dict["HIGHFREQUENCY"]}.pickle'
 
 ## random seed for numpy
 np.random.seed(SEED)
