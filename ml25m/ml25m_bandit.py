@@ -1,7 +1,5 @@
 from driver import *
 
-PLOTREGRET = config_dict["PLOTREGRET"]
-
 ## getting the offline optimal objectives
 if PLOTREGRET:
     with open(OFFLINE_OPTIMAL_FILE, "rb") as f:
@@ -87,7 +85,6 @@ for t in tqdm(range(len(data))):
 ## plotting
 # %matplotlib inline
 import matplotlib.pyplot as plt
-USETEXLIVE = config_dict["USETEXLIVE"]
 
 if USETEXLIVE:
     plt.rc('text', usetex=True)
