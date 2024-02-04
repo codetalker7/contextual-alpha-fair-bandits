@@ -14,14 +14,8 @@ policies = [
 ## keeping track of cumulative rewards
 cumulative_rewards = [[np.ones(NUM_ARMS, )] for i in range(len(policies))]
 
-## alpha-performance
-alpha_performance = [[] for i in range(len(policies))]
-
 ## jain's fairness index
 fairness_index = [[] for i in range(len(policies))]
-
-## sum of rewards
-sum_rewards = [[0] for i in range(len(policies))]
 
 if PLOTREGRET:
     ## standard regrets
@@ -40,10 +34,6 @@ for t in tqdm(range(len(data))):
     ## get rewards corresponding to the movie
     rewards = reward_function(movieId)
 
-    ## update performance
-    for i in range(len(policies)):
-        sum_rewards[i].append(sum_rewards[i][-1] + rewards[recommended_genres[i] - 1])
-
     ## update cumulative rewards
     for i in range(len(policies)):
         last_cum_rewards = cumulative_rewards[i][-1]
@@ -52,11 +42,6 @@ for t in tqdm(range(len(data))):
             cumulative_rewards[i].append(last_cum_rewards + rewards * (policies[i].weights / np.sum(policies[i].weights)))
         else:
             cumulative_rewards[i].append(last_cum_rewards + rewards * policies[i].last_decision)
-
-    ## updating alpha-performance
-    for i in range(len(policies)):
-        last_cum_rewards = cumulative_rewards[i][-1]
-        alpha_performance[i].append((last_cum_rewards ** (1 - ALPHA) / (1 - ALPHA)).sum())
 
     ## update the fairness index
     for i in range(len(policies)):
@@ -91,37 +76,8 @@ plt.rcParams["figure.figsize"] = (5, 4)
 
 time = np.arange(1, len(data) + 1)
 
-## plotting performance
-performance = [np.array(sum_rewards[i][1:]) * (1 / time) for i in range(len(policies))]
-
-plt.figure(0)
-ax = plt.axes()
-for i in range(len(policies)):
-    plt.plot(time, performance[i], label=labels[i])
-plt.xlabel("Time")
-plt.ylabel("Performance")
-# if USETEXLIVE:
-#     plt.text(0.5, 0.95, f"$\\alpha={ALPHA}$, $\\nu = {config_dict['FAIRCBFAIRNESS']}$, $\\delta={SMALL_REWARD}$", horizontalalignment='center', verticalalignment='center', transform=ax.transAxes)
-# plt.title("Performance Plot")
-plt.savefig(PERFORMANCE_PLOT_PATH, bbox_inches='tight', pad_inches=0.01)
-
-## plotting alpha-performance
-plt.figure(1)
-ax = plt.axes()
-for i in range(len(policies)):
-    plt.plot(time, alpha_performance[i], label=labels[i])
-plt.legend(loc="upper left", fontsize="large")
-plt.xlabel("Time", fontsize="large")
-if USETEXLIVE:
-    # plt.text(0.5, 0.95, f"$\\alpha={ALPHA}$, $\\nu = {config_dict['FAIRCBFAIRNESS']}$, $\\delta={SMALL_REWARD}$", horizontalalignment='center', verticalalignment='center', transform=ax.transAxes)
-    plt.ylabel(r"$\alpha$-Performance", fontsize="large")
-else:
-    plt.ylabel("alpha-Performance", fontsize="large")
-# plt.title("Alpha-Performance Plot (Full Information Setting)", fontsize="large")
-plt.savefig(ALPHA_PERFORMANCE_PLOT_PATH, bbox_inches='tight', pad_inches=0.01)
-
 ## plotting fairness
-plt.figure(2)
+plt.figure(0)
 ax = plt.axes()
 for i in range(len(policies)):
     plt.plot(time, fairness_index[i], label=labels[i])
@@ -135,7 +91,7 @@ plt.savefig(JAINS_FAIRNESS_PLOT_PATH, bbox_inches='tight', pad_inches=0.01)
 
 ## plotting standard regrets
 if PLOTREGRET:
-    plt.figure(3)
+    plt.figure(1)
     ax = plt.axes()
     for i in range(len(policies)):
         plt.plot(time, standard_regrets[i], label=labels[i])
@@ -148,7 +104,7 @@ if PLOTREGRET:
     plt.savefig(STANDARD_REGRET_PLOT_PATH, bbox_inches='tight', pad_inches=0.01)
 
     ## plotting approximate regrets
-    plt.figure(4)
+    plt.figure(2)
     ax = plt.axes()
     for i in range(len(policies)):
         plt.plot(time, approximate_regrets[i], label=labels[i])
