@@ -8,10 +8,10 @@ from utils import jains_fairness_index
 import matplotlib.pyplot as plt
 
 ## for varying nu experiments
-FAIRNESS_VALUES_FILE = f'pickled_files/fairness_values_rows={config_dict["ROWS"]}_seed={SEED}_alpha={ALPHA}_smallreward={SMALL_REWARD}_usetimestamps={USETIMESTAMPS}_frequency={config_dict["FREQUENCY"]}_frequencymax={config_dict["FREQUENCY_MAX"]}_highfrequency={config_dict["HIGHFREQUENCY"]}_numnus={NUM_NUS}.pickle'
+FAIRNESS_VALUES_FILE = f'pickled_files/fairness_values_rows={ROWS}_seed={SEED}_alpha={ALPHA}_smallreward={SMALL_REWARD}_usetimestamps={USETIMESTAMPS}_frequency={FREQUENCY}_frequencymax={FREQUENCY_MAX}_highfrequency={HIGHFREQUENCY}_numnus={NUM_NUS}_varyingnurounds={VARYING_NU_ROUNDS}.pickle'
 
 ## for varying alpha experiments
-CUMULATIVE_REWARDS_FILE = f'pickled_files/cumulative_rewards_rows={config_dict["ROWS"]}_seed={SEED}_alpha={ALPHA}_smallreward={SMALL_REWARD}_usetimestamps={USETIMESTAMPS}_frequency={config_dict["FREQUENCY"]}_frequencymax={config_dict["FREQUENCY_MAX"]}_highfrequency={config_dict["HIGHFREQUENCY"]}_numalphas={NUM_ALPHAS}.pickle'
+CUMULATIVE_REWARDS_FILE = f'pickled_files/cumulative_rewards_rows={ROWS}_seed={SEED}_smallreward={SMALL_REWARD}_usetimestamps={USETIMESTAMPS}_frequency={FREQUENCY}_frequencymax={FREQUENCY_MAX}_highfrequency={HIGHFREQUENCY}_numalphas={NUM_ALPHAS}.pickle'
 
 ## getting the context distribution for fairCB
 valueCounts = data["userId"].value_counts()

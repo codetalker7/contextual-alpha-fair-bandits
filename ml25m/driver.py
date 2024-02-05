@@ -56,7 +56,7 @@ NUM_CONTEXTS = int(stats_dict["NUM_CONTEXTS"])
 NUM_ARMS = int(stats_dict["NUM_ARMS"])
 
 ## offline optimal filename
-OFFLINE_OPTIMAL_FILE = f'pickled_files/offline_optimal_rows={config_dict["ROWS"]}_seed={SEED}_alpha={ALPHA}_smallreward={SMALL_REWARD}_usetimestamps={USETIMESTAMPS}_frequency={config_dict["FREQUENCY"]}_frequencymax={config_dict["FREQUENCY_MAX"]}_highfrequency={config_dict["HIGHFREQUENCY"]}.pickle'
+OFFLINE_OPTIMAL_FILE = f'pickled_files/offline_optimal_rows={ROWS}_seed={SEED}_alpha={ALPHA}_smallreward={SMALL_REWARD}_usetimestamps={USETIMESTAMPS}_frequency={FREQUENCY}_frequencymax={FREQUENCY_MAX}_highfrequency={HIGHFREQUENCY}.pickle'
 
 ## random seed for numpy
 np.random.seed(SEED)
