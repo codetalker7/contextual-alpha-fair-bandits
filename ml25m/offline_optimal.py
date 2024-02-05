@@ -35,6 +35,6 @@ for t in tqdm(range(len(data))):
     offline_optimal_values.append(-problem.value)
 
 # saving the offline optimal values
-filename = f'pickled_files/offline_optimal_rows={config_dict["ROWS"]}_seed={SEED}_alpha={ALPHA}_smallreward={SMALL_REWARD}_usetimestamps={USETIMESTAMPS}_frequency={config_dict["FREQUENCY"]}_highfrequency={config_dict["HIGHFREQUENCY"]}.pickle'
+filename = f'pickled_files/offline_optimal_rows={config_dict["ROWS"]}_seed={SEED}_alpha={ALPHA}_smallreward={SMALL_REWARD}_usetimestamps={USETIMESTAMPS}_frequency={config_dict["FREQUENCY"]}_frequencymax={config_dict["FREQUENCY_MAX"]}_highfrequency={config_dict["HIGHFREQUENCY"]}.pickle'
 with open(filename, "wb") as f:
     pickle.dump(offline_optimal_values, f)
