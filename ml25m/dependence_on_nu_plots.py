@@ -12,7 +12,7 @@ if USETEXLIVE:
     plt.rc('text.latex', preamble=r'\usepackage{amsmath}')
     labels = [f"\\text{{FairCB}}", f"\\text{{This paper with }}$\\alpha = {ALPHA}$"]
 else:
-    labels = [f"\\text{{FairCB}}", f"\\text{{This paper with alpha = }}{ALPHA}"]
+    labels = [f"FairCB", f"This paper with alpha = ALPHA"]
 plt.style.use('seaborn-v0_8-darkgrid')
 plt.rcParams["figure.figsize"] = (5, 4)
 
