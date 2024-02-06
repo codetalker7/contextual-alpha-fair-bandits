@@ -28,6 +28,7 @@ if USETEXLIVE:
 else:
     plt.xlabel("nu", fontsize="large")
 plt.ylabel("Jain's Fairness Index", fontsize="large")
+plt.legend(loc="center left", fontsize="large")
 # if USETEXLIVE:
 #     plt.text(0.5, 0.95, f"$\\alpha={ALPHA}$, $\\nu = {config_dict['FAIRCBFAIRNESS']}$, $\\delta={SMALL_REWARD}$", horizontalalignment='center', verticalalignment='center', transform=ax.transAxes)
 # plt.title("Jain's Fairness Index Plot (Full Information Setting)", fontsize="large")
