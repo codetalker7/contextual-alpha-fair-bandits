@@ -33,7 +33,7 @@ ax.patch.set_linewidth(1)
 ax.tick_params(direction='out', length=5, width=0.5, grid_alpha=0.5)
 for i in range(len(policies)):
     plt.plot(time, fairness_index[i], label=labels[i], color=colors[i], linestyle=linestyles[i])
-plt.legend(loc="lower right", fontsize="large")
+plt.legend(loc="upper right", fontsize="large")
 plt.xlabel("Time", fontsize="large")
 plt.ylabel("Jain's Fairness Index", fontsize="large")
 # if USETEXLIVE:
