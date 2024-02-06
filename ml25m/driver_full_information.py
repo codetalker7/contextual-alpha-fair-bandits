@@ -4,8 +4,10 @@ from Hedge import Hedge
 from ParallelOPF import ParallelOPF
 from FairCB import FairCB
 from utils import jains_fairness_index
-
 import matplotlib.pyplot as plt
+
+## full information experiments
+FULL_INFORMATION_FILE = f'pickled_files/full_information_rows={ROWS}_seed={SEED}_alpha={ALPHA}_smallreward={SMALL_REWARD}_usetimestamps={USETIMESTAMPS}_frequency={FREQUENCY}_frequencymax={FREQUENCY_MAX}_faircbfairness={FAIRCBFAIRNESS}_highfrequency={HIGHFREQUENCY}.pickle'
 
 ## for varying nu experiments
 FAIRNESS_VALUES_FILE = f'pickled_files/fairness_values_rows={ROWS}_seed={SEED}_alpha={ALPHA}_smallreward={SMALL_REWARD}_usetimestamps={USETIMESTAMPS}_frequency={FREQUENCY}_frequencymax={FREQUENCY_MAX}_highfrequency={HIGHFREQUENCY}_numnus={NUM_NUS}_varyingnurounds={VARYING_NU_ROUNDS}.pickle'
