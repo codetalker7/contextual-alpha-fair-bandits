@@ -6,17 +6,23 @@ with open(FAIRNESS_VALUES_FILE, 'rb') as f:
     nus = fairness_dict["nus"]
     fairness_values = fairness_dict["fairness_values"]
     alphaFairCBValue = fairness_dict["alphaFairCBValue"]
-
+    
 if USETEXLIVE:
     plt.rc('text', usetex=True)
     plt.rc('text.latex', preamble=r'\usepackage{amsmath}')
+    labels = [f"\\text{{FairCB}}", f"\\text{{This paper with }}$\\alpha = {ALPHA}$"]
+else:
+    labels = [f"\\text{{FairCB}}", f"\\text{{This paper with alpha = }}{ALPHA}"]
 plt.style.use('seaborn-v0_8-darkgrid')
 plt.rcParams["figure.figsize"] = (5, 4)
 
 plt.figure(0)
 ax = plt.axes()
-plt.plot(nus, fairness_values, color='b')
-plt.axhline(y=alphaFairCBValue, color='r')
+ax.patch.set_edgecolor('black')  
+ax.patch.set_linewidth(1)  
+ax.tick_params(direction='out', length=5, width=0.5, grid_alpha=0.5)
+plt.plot(nus, fairness_values, color='b', label=labels[0])
+plt.axhline(y=alphaFairCBValue, color='r', label=labels[1])
 if USETEXLIVE:
     plt.xlabel(r"$\nu$", fontsize="large")
 else:
