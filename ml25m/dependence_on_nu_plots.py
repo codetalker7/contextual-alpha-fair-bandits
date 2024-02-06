@@ -24,9 +24,9 @@ ax.tick_params(direction='out', length=5, width=0.5, grid_alpha=0.5)
 plt.plot(nus, fairness_values, color='b', label=labels[0])
 plt.axhline(y=alphaFairCBValue, color='r', label=labels[1])
 if USETEXLIVE:
-    plt.xlabel(r"$\nu$", fontsize="large")
+    plt.xlabel(r"$N\nu$", fontsize="large")
 else:
-    plt.xlabel("nu", fontsize="large")
+    plt.xlabel("N * nu", fontsize="large")
 plt.ylabel("Jain's Fairness Index", fontsize="large")
 plt.legend(loc="center left", fontsize="large")
 # if USETEXLIVE:
