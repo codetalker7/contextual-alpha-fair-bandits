@@ -15,9 +15,11 @@ with open(FULL_INFORMATION_FILE, 'rb') as f:
 if USETEXLIVE:
     plt.rc('text', usetex=True)
     plt.rc('text.latex', preamble=r'\usepackage{amsmath}')
-    labels = [r"\textsc{Hedge}", r"$\alpha$\textsc{-FairCB}", r"\textsc{FairCB}"]
+    labels = [r"\textsc{Hedge}", r"\text{This paper}", r"\textsc{FairCB}"]
 else:
-    labels = ["Hedge", "alpha-FairCB", "FairCB"]
+    labels = ["Hedge", "This paper", "FairCB"]
+colors = ["g", "r", "b"]
+linestyles= ["dotted", "solid", "dashed"]
 plt.style.use('seaborn-v0_8-darkgrid')
 plt.rcParams["figure.figsize"] = (5, 4)
 
@@ -26,8 +28,11 @@ time = np.arange(1, len(data) + 1)
 ## plotting fairness
 plt.figure(0)
 ax = plt.axes()
+ax.patch.set_edgecolor('black')  
+ax.patch.set_linewidth(1)  
+ax.tick_params(direction='out', length=5, width=0.5, grid_alpha=0.5)
 for i in range(len(policies)):
-    plt.plot(time, fairness_index[i], label=labels[i])
+    plt.plot(time, fairness_index[i], label=labels[i], color=colors[i], linestyle=linestyles[i])
 plt.legend(loc="lower right", fontsize="large")
 plt.xlabel("Time", fontsize="large")
 plt.ylabel("Jain's Fairness Index", fontsize="large")
@@ -40,8 +45,11 @@ plt.savefig(JAINS_FAIRNESS_PLOT_PATH, bbox_inches='tight', pad_inches=0.01)
 if PLOTREGRET:
     plt.figure(1)
     ax = plt.axes()
+    ax.patch.set_edgecolor('black')  
+    ax.patch.set_linewidth(1)  
+    ax.tick_params(direction='out', length=5, width=0.5, grid_alpha=0.5)
     for i in range(len(policies)):
-        plt.plot(time, standard_regrets[i], label=labels[i])
+        plt.plot(time, standard_regrets[i], label=labels[i], color=colors[i], linestyle=linestyles[i])
     plt.legend(loc="upper left", fontsize="large")
     plt.xlabel("Time", fontsize="large")
     plt.ylabel("Standard Regret", fontsize="large")
@@ -53,8 +61,11 @@ if PLOTREGRET:
     ## plotting approximate regrets
     plt.figure(2)
     ax = plt.axes()
+    ax.patch.set_edgecolor('black')  
+    ax.patch.set_linewidth(1)  
+    ax.tick_params(direction='out', length=5, width=0.5, grid_alpha=0.5)
     for i in range(len(policies)):
-        plt.plot(time, approximate_regrets[i], label=labels[i])
+        plt.plot(time, approximate_regrets[i], label=labels[i], color=colors[i], linestyle=linestyles[i])
     plt.legend(loc="upper left", fontsize="large")
     plt.xlabel("Time", fontsize="large")
     plt.ylabel("Approximate Regret", fontsize="large")
