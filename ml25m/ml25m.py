@@ -62,7 +62,7 @@ for t in tqdm(range(len(data))):
     for i in range(len(policies)):
         policies[i].feedback(rewards)
 
-with open(FULL_INFORMATION_FILE, 'rb') as f:
+with open(FULL_INFORMATION_FILE, 'wb') as f:
     full_information_dict = {
         "policies": policies, 
         "fairness_index": fairness_index,
