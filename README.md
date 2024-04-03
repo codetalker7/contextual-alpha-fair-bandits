@@ -15,50 +15,95 @@ To generate plots, we also use the `texlive` distribution along with a few addit
 sudo apt install texlive-fonts-recommended texlive-fonts-extra cm-super dvipng
 ```
 
+If you don't want to use `texlive` in plots, just leave out the `--USETEXLIVE` option in the config below.
+
+
 # Running experiments on the [MovieLens 25M](https://grouplens.org/datasets/movielens/25m/) dataset
 
+Throughout this section, we assume that we're working in the `ml25m` folder.
+
 ## Preparing the data
-The `ml25m` directory contains experiments for the [MovieLens 25M](https://grouplens.org/datasets/movielens/25m/) dataset. `cd` into the `ml25m` folder. You may use the `get_data.sh` script to download and extract the dataset. Before running the experiments, use the `data_exploration.py` script to prepare the data needed to run the experiments. You may use the option `--ROWS` to specify the number of rows of the dataset to be used in the experiments; for the experiments in the paper, the first 5000 rows of the dataset were used. Also, the `data_exploration.py` script shuffles the specified number of rows randomly (this is done to create an interesting arrival sequence). For reproducability, use the `--SEED` option to specify the random seed to do the shuffling. Also, the `--USETIMESTAMPS` true option can be specified to `True` (and leave the option to specify it to `False`), if the dataset is to be sorted by timestamps. For the paper, we used the following to run the script:
+
+Use the `get_data.sh` script to download the dataset:
+
+```shell
+./get_data.sh
+```
+
+This will download and extract the dataset in a folder called `data`.
+
+## Set the config.
+
+As part of the repository, we've already included the config file we used to run our code (`config.json`). For completeness, here are all the config parameters we used to run our code (leave out `--USETEXLIVE` if you don't have a `texlive` distribution):
+
+```shell
+python3 -m config --ROWS=50000 --SEED=1 --ALPHA=0.9 --SMALLREWARD=0.001 --USETIMESTAMPS --FREQUENCY=1000 --FREQUENCY_MAX=1000 --FAIRCBFAIRNESS=0.98 --USETEXLIVE --HIGHFREQUENCY --PLOTREGRET --NUMNUS=50 --NUMALPHAS=50 --VARYING_NU_ROUNDS=10
+```
+
+Details about the config parameters are given in the `config.py` file.
+
+## Prepare the dataset
+
+Just use the `data_exploration` script for this:
 
 ```
-python3 -m data_exploration --SEED=1 --ROWS=5000 --USETIMESTAMPS=True
+python -m data_exploration
 ```
 
 ## Computing the offline benchmark
 
-To compute the approximate-regret for any policy, the $\alpha$-fair offline benchmark must also be computed. To do this, the `offline_optimal.py` script is provided. The script needs two parameters to run: the fairness parameter (which is named $\alpha$ in the paper), which is specified using the `--ALPHA` option, and a reward parameter, specifying rewards for "bad" arms, which is specified using the `--SMALLREWARD` option (recall that in our experiments, we assign a reward of $1$ to "good" arms, and a small positive reward to "bad" arms). For our paper, we used the following values for the options:
+To compute the offline optimal benchmark (used to plot the approximate and standard regrets), use this:
 
-```
-python3 -m offline_optimal --ALPHA=0.9 --SMALLREWARD=0.2
-```
-
-## Running the full-information and bandit-information feedback experiments
-
-Experiments for the full-information feedback setting are given in the `ml25m.py` scipt. The script takes in values for the options `--ALPHA`, `--SMALLREWARD` and `--SEED`. The `--ALPHA` and `--SMALLREWARD` options are the same as before; the `--SEED` option is used to specify a random seed to be used to get reproducible results, since the policies which we are running are random. For the paper, the script was run as follows:
-
-```
-python3 -m ml25m --ALPHA=0.9 --SMALLREWARD=0.2
+```shell
+python3 -m offline_optimal_optimized
 ```
 
-The experiments for the bandit-information feedback setting are given in the `ml25m_bandit.py` script, and is similar to the `ml25m.py` script for the full-information setting. For the paper, it was run as follows:
+## The full information setting experiments
+
+Just run the `ml25m` and `ml25m_plots` scripts: 
+
+```shell
+python3 -m ml25m
+python3 -m ml25m_plots
+```
+
+## Experiments for varying values of $\alpha$
+
+For the experiments with varying values of $\alpha$, use the following scripts:
+
+```shell
+python3 -m dependence_on_alpha
+python3 -m dependence_on_alpha_plots
+```
+
+## Experiments for varying values of $\nu$
+
+We also compared the performance of our policy with the `FairCB` policy by Chen et. al 2020 (by trying out different values of $\nu$, the fairness parameter of `FairCB`, against our policy with $\alpha=0.9$). To run these experiments and get the corresponding plot, just run the following:
+
+```shell
+python3 -m dependence_on_nu
+python3 -m dependence_on_nu_plots
+```
+
+
+## The bandit information setting experiments
+
+For the bandit setting, just use the `ml25m_bandit` and `ml25m_bandit_plots` scripts:
+
+```shell
+python3 -m ml25m_bandit
+python3 -m ml25m_bandit_plots
+```
+
+For the bandit setting, we also used a larger number of datapoints to plot Jain's Fairness Index (i.e around 50k points). For this, from the old config, remove the `--HIGHFREQUENCY` and `--PLOTREGRET` options, and then run the experiments:
 
 ```
-python3 -m ml25m_bandit --ALPHA=0.9 --SMALLREWARD=0.2
+python3 -m config --ROWS=50000 --SEED=1 --ALPHA=0.9 --SMALLREWARD=0.001 --USETIMESTAMPS --FREQUENCY=1000 --FREQUENCY_MAX=1000 --FAIRCBFAIRNESS=0.98 --USETEXLIVE --NUMNUS=50 --NUMALPHAS=50 --VARYING_NU_ROUNDS=10
+python3 -m data_exploration
+python3 -m ml25m_bandit
+python3 -m ml25m_bandit_plots
 ```
 
 <!-- For Hedge algorithm, see this link: http://www.columbia.edu/~cs2035/courses/ieor6614.S16/mw.pdf. -->
 
-## Experiments for varying values of $\alpha$
 
-For experiments when the value of $\alpha$ varies in the interval $[0, 1)$, we need contexts (users) which have a high frequency in the dataset. This is needed for our bandit algorithm, since our algorithm uses a subroutine which has an exploration component; if the frequency of a context is very less, then the subroutine for this context will still be in an exploration phase. For this, we have the `data_exploration_new.py` script, which has a new `--FREQUENCY` option. This option gets only those contexts out of the dataset which have a frequency higher than the specified value of this option. For the paper, we ran this script as follows:
-
-```
-python3 -m data_exploration_new --SEED=1 --FREQUENCY=5000
-```
-
-Then, we run the `dependence_on_alpha.py` and `dependence_on_alpha_bandit.py` scripts, which run a few experiments for varying value of `alpha` for the full information and bandit settings respectively. For the paper, we ran these scripts as follows:
-
-```
-python3 -m dependence_on_alpha --SMALLREWARD=0.2
-python3 -m dependence_on_alpha_bandit --SMALLREWARD=0.001
-```
