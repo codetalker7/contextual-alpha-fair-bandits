@@ -6,3 +6,5 @@ wget https://files.grouplens.org/datasets/movielens/ml-25m.zip -O data/ml-25m.zi
 
 cd data
 unzip ml-25m.zip
+
+mkdir -p pickled_files
