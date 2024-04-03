@@ -11,7 +11,7 @@ parser.add_argument('--FREQUENCY', dest='FREQUENCY', default=5000, help='Minimum
 parser.add_argument('--FREQUENCY_MAX', dest='FREQUENCY_MAX', default=10000, help='Maximum frequency of a context in the resultant dataset.')
 parser.add_argument('--FAIRCBFAIRNESS', dest='FAIRCBFAIRNESS', default=0.5, help='Fairness parameter to be used for the FairCB algorithm.')
 parser.add_argument('--USETEXLIVE', dest='USETEXLIVE', action='store_true', help='Whether to use TexLive during plot generation.')
-parser.add_argument('--HIGHFREQUENCY', dest='HIGHFREQUENCY', action='store_true', help='Whether to use only those users whose frequency is larger than FREQUENCY.')
+parser.add_argument('--HIGHFREQUENCY', dest='HIGHFREQUENCY', action='store_true', help='Whether to use only those users whose frequency is atleast FREQUENCY and atmost FREQUENCY_MAX.')
 parser.add_argument('--PLOTREGRET', dest='PLOTREGRET', action='store_true', help='True if standard/approximate regret needs to be plotted. False otherswise. This saves time if offline optimal values dont have to be computed.')
 parser.add_argument('--NUMNUS', dest='NUM_NUS', default=50, help='Number of values of nu (the fairness parameter for FairCB) required for the experiments for varying values of nu.')
 parser.add_argument('--NUMALPHAS', dest='NUM_ALPHAS', default=50, help='Number of values of alpha (the fairness parameter for our policy) required for the experiments for varying values of alpha.')
