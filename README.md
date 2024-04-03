@@ -30,7 +30,11 @@ Use the `get_data.sh` script to download the dataset:
 ./get_data.sh
 ```
 
-This will download and extract the dataset in a folder called `data`.
+This will download and extract the dataset in a folder called `data`. Also, create a folder called `pickled_files`:
+
+```
+mkdir -p pickled_files
+```
 
 ## Set the config.
 
