@@ -17,7 +17,7 @@ ax = plt.axes()
 ax.patch.set_edgecolor('black')  
 ax.patch.set_linewidth(1)  
 ax.tick_params(direction='out', length=5, width=0.5, grid_alpha=0.5)
-plt.plot(alphas, [cumulative_rewards[i][-1].sum() / NUM_ARMS for i in range(len(alphas))])
+plt.plot(alphas, [cumulative_rewards[i][-1].sum() / NUM_ARMS for i in range(len(alphas))], color='b')
 plt.legend(loc="upper left", fontsize="large")
 if USETEXLIVE: 
     plt.xlabel(r"$\alpha$", fontsize="large")
