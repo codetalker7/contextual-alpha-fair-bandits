@@ -18,7 +18,7 @@ if USETEXLIVE:
     labels = [r"\textsc{Hedge}", r"\text{This paper}", r"\textsc{FairCB}", r"\text{Indepedent OPFs}"]
 else:
     labels = ["Hedge", "This paper", "FairCB", "Independent OPFs"]
-colors = ["g", "r", "b", "p"]
+colors = ["g", "r", "b", "m"]
 linestyles= ["dotted", "solid", "dashed", "dashdot"]
 plt.style.use('seaborn-v0_8-darkgrid')
 plt.rcParams["figure.figsize"] = (5, 4)
