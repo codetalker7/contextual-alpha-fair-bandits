@@ -15,11 +15,11 @@ with open(FULL_INFORMATION_FILE, 'rb') as f:
 if USETEXLIVE:
     plt.rc('text', usetex=True)
     plt.rc('text.latex', preamble=r'\usepackage{amsmath}')
-    labels = [r"\textsc{Hedge}", r"\text{This paper}", r"\textsc{FairCB}"]
+    labels = [r"\textsc{Hedge}", r"\text{This paper}", r"\textsc{FairCB}", r"\text{Indepedent OPFs}"]
 else:
-    labels = ["Hedge", "This paper", "FairCB"]
-colors = ["g", "r", "b"]
-linestyles= ["dotted", "solid", "dashed"]
+    labels = ["Hedge", "This paper", "FairCB", "Independent OPFs"]
+colors = ["g", "r", "b", "p"]
+linestyles= ["dotted", "solid", "dashed", "dashdot"]
 plt.style.use('seaborn-v0_8-darkgrid')
 plt.rcParams["figure.figsize"] = (5, 4)
 

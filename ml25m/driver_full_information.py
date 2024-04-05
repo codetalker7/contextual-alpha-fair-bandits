@@ -3,6 +3,7 @@ from driver import *
 from Hedge import Hedge
 from ParallelOPF import ParallelOPF
 from FairCB import FairCB
+from IndependentOPF import IndependentOPF
 from utils import jains_fairness_index
 import matplotlib.pyplot as plt
 

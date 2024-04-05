@@ -8,7 +8,8 @@ if PLOTREGRET:
 policies = [
     Hedge(NUM_CONTEXTS, NUM_ARMS, len(data)),
     ParallelOPF(NUM_CONTEXTS, NUM_ARMS, ALPHA),
-    FairCB(NUM_CONTEXTS, NUM_ARMS, config_dict["FAIRCBFAIRNESS"] / NUM_ARMS, len(data), context_distribution)
+    FairCB(NUM_CONTEXTS, NUM_ARMS, config_dict["FAIRCBFAIRNESS"] / NUM_ARMS, len(data), context_distribution),
+    IndependentOPF(NUM_CONTEXTS, NUM_ARMS, ALPHA)
 ]
 
 ## keeping track of cumulative rewards
