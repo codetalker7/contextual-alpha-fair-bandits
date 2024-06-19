@@ -111,4 +111,19 @@ python3 -m ml25m_bandit_plots
 
 <!-- For Hedge algorithm, see this link: http://www.columbia.edu/~cs2035/courses/ieor6614.S16/mw.pdf. -->
 
+# Citation
 
+If you find this work to be useful, then please cite:
+
+```bibtex
+@inproceedings{
+    chaudhary2024alphafair,
+    title={\${\textbackslash}alpha\$-Fair Contextual Bandits},
+    author={Siddhant Chaudhary and Abhishek Sinha},
+    booktitle={ICML 2024 Workshop: Foundations of Reinforcement Learning and Control -- Connections and Perspectives},
+    year={2024},
+    url={https://openreview.net/forum?id=y0KQKrrgbC}
+}
+```
+
+Also consider starring this repo!
